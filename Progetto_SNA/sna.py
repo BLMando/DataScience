@@ -8,9 +8,9 @@
 #       format_version: '1.3'
 #       jupytext_version: 1.18.1
 #   kernelspec:
-#     display_name: Python (data env)
+#     display_name: base
 #     language: python
-#     name: data
+#     name: python3
 # ---
 
 # %% [markdown]
@@ -169,7 +169,7 @@ papers = pd.read_csv(f"{SESSION_PATH}/papers.csv")
 # # Grafi
 
 # %%
-# per testing e sviluppo delle librerire, rilanciare questo blocco ogni volta che viene
+# per testing e sviluppo delle librerie, rilanciare questo blocco ogni volta che viene
 # aggiornata una libreria
 
 # Source - https://stackoverflow.com/a/437591
@@ -186,8 +186,8 @@ graphing = reload(graphing)
 # %%
 name = "circular-wpg"
 pg = nx.DiGraph()
-add_edges(pg, citations_uni)
-wpg = edge_collapse(pg, nx.DiGraph)
+graphing.add_edges(pg, citations_uni)
+wpg = graphing.edge_collapse(pg, nx.DiGraph)
 lay = graphing.GLAYOUTS.circular
 pos = lay(wpg)
 data = graphing.gen_graph_data(wpg, pos)
@@ -201,12 +201,11 @@ graphing.plot_graph(data, save_path=f"{SESSION_PATH}/{name}")
 # Posted by cdleary, modified by community. See post 'Timeline' for change history
 # Retrieved 2025-11-21, License - CC BY-SA 4.0
 from importlib import reload  # Python 3.4+
-
 graphing = reload(graphing)
 name = "graph-arf-wpg"
 pg = nx.DiGraph()
-add_edges(pg, citations_uni)
-wpg = edge_collapse(pg, nx.DiGraph)
+graphing.add_edges(pg, citations_uni)
+wpg = graphing.edge_collapse(pg, nx.DiGraph)
 lay = graphing.GLAYOUTS.arf
 pos = lay(wpg)
 data = graphing.gen_graph_data(wpg, pos)
@@ -217,13 +216,12 @@ graphing.plot_graph(data, save_path=f"{SESSION_PATH}/{name}")
 # Posted by cdleary, modified by community. See post 'Timeline' for change history
 # Retrieved 2025-11-21, License - CC BY-SA 4.0
 from importlib import reload  # Python 3.4+
-
 graphing = reload(graphing)
 name = "graph-bfs"
 
 pg = nx.DiGraph()
-add_edges(pg, citations_uni)
-wpg = edge_collapse(pg, nx.DiGraph)
+graphing.add_edges(pg, citations_uni)
+wpg = graphing.edge_collapse(pg, nx.DiGraph)
 lay = graphing.GLAYOUTS.bipartite
 pos = lay(pg)
 data = graphing.gen_default(pg, pos)
@@ -234,12 +232,11 @@ graphing.plot_graph(data, save_path=f"{SESSION_PATH}/{name}")
 # Posted by cdleary, modified by community. See post 'Timeline' for change history
 # Retrieved 2025-11-21, License - CC BY-SA 4.0
 from importlib import reload  # Python 3.4+
-
 graphing = reload(graphing)
 name = "graph-bfs"
 pg = nx.DiGraph()
-add_edges(pg, citations_uni)
-wpg = edge_collapse(pg, nx.DiGraph)
+graphing.add_edges(pg, citations_uni)
+wpg = graphing.edge_collapse(pg, nx.DiGraph)
 lay = graphing.GLAYOUTS.bfs
 pos = lay(pg)
 data = graphing.gen_default(pg, pos)
@@ -250,12 +247,11 @@ graphing.plot_graph(data, save_path=f"{SESSION_PATH}/{name}")
 # Posted by cdleary, modified by community. See post 'Timeline' for change history
 # Retrieved 2025-11-21, License - CC BY-SA 4.0
 from importlib import reload  # Python 3.4+
-
 graphing = reload(graphing)
 name = "kamada-wpg"
 pg = nx.DiGraph()
-add_edges(pg, citations_uni)
-wpg = edge_collapse(pg, nx.DiGraph)
+graphing.add_edges(pg, citations_uni)
+wpg = graphing.edge_collapse(pg, nx.DiGraph)
 lay = graphing.GLAYOUTS.kamada
 pos = lay(wpg, weight="w")
 data = graphing.gen_graph_data(wpg, pos)
@@ -266,12 +262,11 @@ graphing.plot_graph(data, save_path=f"{SESSION_PATH}/{name}")
 # Posted by cdleary, modified by community. See post 'Timeline' for change history
 # Retrieved 2025-11-21, License - CC BY-SA 4.0
 from importlib import reload  # Python 3.4+
-
 graphing = reload(graphing)
 name = "planar"
 pg = nx.DiGraph()
-add_edges(pg, citations_uni)
-wpg = edge_collapse(pg, nx.DiGraph)
+graphing.add_edges(pg, citations_uni)
+wpg = graphing.edge_collapse(pg, nx.DiGraph)
 lay = graphing.GLAYOUTS.planar
 pos = lay(pg)
 data = graphing.gen_default(pg, pos)
@@ -282,12 +277,11 @@ graphing.plot_graph(data, save_path=f"{SESSION_PATH}/{name}")
 # Posted by cdleary, modified by community. See post 'Timeline' for change history
 # Retrieved 2025-11-21, License - CC BY-SA 4.0
 from importlib import reload  # Python 3.4+
-
 graphing = reload(graphing)
 name = "spring-base-wpg"
 pg = nx.DiGraph()
-add_edges(pg, citations_uni)
-wpg = edge_collapse(pg, nx.DiGraph)
+graphing.add_edges(pg, citations_uni)
+wpg = graphing.edge_collapse(pg, nx.DiGraph)
 lay = graphing.GLAYOUTS.spring
 pos = lay(wpg, weight="w")
 data = graphing.gen_graph_data(wpg, pos)
@@ -298,12 +292,11 @@ graphing.plot_graph(data, save_path=f"{SESSION_PATH}/{name}")
 # Posted by cdleary, modified by community. See post 'Timeline' for change history
 # Retrieved 2025-11-21, License - CC BY-SA 4.0
 from importlib import reload  # Python 3.4+
-
 graphing = reload(graphing)
 name = "spring-force-wpg"
 pg = nx.DiGraph()
-add_edges(pg, citations_uni)
-wpg = edge_collapse(pg, nx.DiGraph)
+graphing.add_edges(pg, citations_uni)
+wpg = graphing.edge_collapse(pg, nx.DiGraph)
 lay = graphing.GLAYOUTS.spring
 pos = lay(wpg, weight="w", method="force")
 data = graphing.gen_graph_data(wpg, pos)
@@ -314,12 +307,11 @@ graphing.plot_graph(data, save_path=f"{SESSION_PATH}/{name}")
 # Posted by cdleary, modified by community. See post 'Timeline' for change history
 # Retrieved 2025-11-21, License - CC BY-SA 4.0
 from importlib import reload  # Python 3.4+
-
 graphing = reload(graphing)
 name = "spring-energy-wpg"
 pg = nx.DiGraph()
-add_edges(pg, citations_uni)
-wpg = edge_collapse(pg, nx.DiGraph)
+graphing.add_edges(pg, citations_uni)
+wpg = graphing.edge_collapse(pg, nx.DiGraph)
 lay = graphing.GLAYOUTS.spring
 pos = lay(wpg, weight="w", method="energy")
 data = graphing.gen_graph_data(wpg, pos)
@@ -330,12 +322,11 @@ graphing.plot_graph(data, save_path=f"{SESSION_PATH}/{name}", show_labels=False)
 # Posted by cdleary, modified by community. See post 'Timeline' for change history
 # Retrieved 2025-11-21, License - CC BY-SA 4.0
 from importlib import reload  # Python 3.4+
-
 graphing = reload(graphing)
 name = "spiral"
 pg = nx.DiGraph()
-add_edges(pg, citations_uni)
-wpg = edge_collapse(pg, nx.DiGraph)
+graphing.add_edges(pg, citations_uni)
+wpg = graphing.edge_collapse(pg, nx.DiGraph)
 lay = graphing.GLAYOUTS.spiral
 pos = lay(pg, resolution=1)
 data = graphing.gen_graph_data(pg, pos)
@@ -346,12 +337,11 @@ graphing.plot_graph(data, save_path=f"{SESSION_PATH}/{name}")
 # Posted by cdleary, modified by community. See post 'Timeline' for change history
 # Retrieved 2025-11-21, License - CC BY-SA 4.0
 from importlib import reload  # Python 3.4+
-
 graphing = reload(graphing)
 name = "spiral-equidistant"
 pg = nx.DiGraph()
-add_edges(pg, citations_uni)
-wpg = edge_collapse(pg, nx.DiGraph)
+graphing.add_edges(pg, citations_uni)
+wpg = graphing.edge_collapse(pg, nx.DiGraph)
 lay = graphing.GLAYOUTS.spiral
 pos = lay(pg, resolution=1, equidistant=True)
 data = graphing.gen_graph_data(pg, pos)
@@ -360,24 +350,16 @@ graphing.plot_graph(data, save_path=f"{SESSION_PATH}/{name}")
 # %% [markdown]
 # Visualizzazione del grafo
 # %%
-unique = len(pd.unique(citations_uni[["source", "target"]].dropna().values.ravel("K")))
-self_loops = len(
-    citations_uni[citations_uni["source"] == citations_uni["target"]].dropna()
-)
+unique = len(pd.unique(citations_uni[['source', 'target']].dropna().values.ravel('K')))
+self_loops = len(citations_uni[citations_uni['source'] == citations_uni["target"]].dropna())
 edges = len(citations_uni.dropna())
 print(f"Abbiamo {unique} universita e centri di ricerca")
 print(f"        {edges} archi")
 print(f"        {self_loops} self loops")
 
 # %%
-unique = len(
-    pd.unique(citations_country[["source", "target"]].dropna().values.ravel("K"))
-)
-self_loops = len(
-    citations_country[
-        citations_country["source"] == citations_country["target"]
-    ].dropna()
-)
+unique = len(pd.unique(citations_country[['source', 'target']].dropna().values.ravel('K')))
+self_loops = len(citations_country[citations_country['source'] == citations_country["target"]].dropna())
 edges = len(citations_country.dropna())
 print(f"Abbiamo {unique} stati")
 print(f"        {edges} archi")
@@ -399,20 +381,32 @@ citations_uni.count()
 # ### Definizione funzioni
 
 # %%
+# per testing e sviluppo delle librerie, rilanciare questo blocco ogni volta che viene
+# aggiornata una libreria
+
+# Source - https://stackoverflow.com/a/437591
+# Posted by cdleary, modified by community. See post 'Timeline' for change history
+# Retrieved 2025-11-21, License - CC BY-SA 4.0
+
+
+metrics = reload(metrics)
 
 # %% [markdown]
 # ### Calcolo Metriche
 
 # %%
 g = nx.DiGraph()
-add_edges(g, citations_uni)
+graphing.add_edges(g, citations_uni)
 wg = g.copy()
-wg = edge_collapse(g, nx.DiGraph)
+wg = graphing.edge_collapse(g, nx.DiGraph)
 
 # %%
-wgm = metrics(wg)
-gm = metrics(g)
+gm  = metrics.calc_metrics(g)
+wgm = metrics.calc_metrics(wg)
 
 # %%
+metrics.plot_distribution(list(gm[0].values()), SESSION_PATH, "Degree Centrality Distribuition - Unweighted Graph")
 
 # %%
+list(gm[0].values())
+gm[0].values().
