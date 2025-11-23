@@ -445,11 +445,13 @@ pg = nx.DiGraph()
 graphing.add_edges(pg, citations_uni)
 lay = graphing.GLAYOUTS.spring
 pos = lay(pg, weight="w", method="energy")
-data = graphing.gen_graph_data(pg, pos)
+
 gm = metrics.GraphMetrics(pg, SESSION_PATH)
 gm.calc_metrics()
-data["node_colors"] = [round(i*100) for i in gm.betweenness.values()]
-graphing.plot_graph(data, label=label, title=title, save_path=f"{SESSION_PATH}/{name}", show_labels=False)
+data = graphing.gen_graph_data(pg, pos, gm.betweenness_cent)
+
+data["node_colors"] = [round(i*100) for i in gm.betweenness_cent.values()]
+graphing.plot_graph(data, label=label, title=title, figsize=graphing.FigSize.XXXL16_9, save_path=f"{SESSION_PATH}/{name}", show_labels=False)
 
 # %%
 # Source - https://stackoverflow.com/a/437591
@@ -463,15 +465,18 @@ name = "spring-EIGENVECTOR"
 label = "Eigenvector Centrality"
 title = "Spring Layout con Eigenvector Centrality"
 
+
 pg = nx.DiGraph()
 graphing.add_edges(pg, citations_uni)
 lay = graphing.GLAYOUTS.spring
 pos = lay(pg, weight="w", method="energy")
-data = graphing.gen_graph_data(pg, pos)
+
 gm = metrics.GraphMetrics(pg, SESSION_PATH)
 gm.calc_metrics()
+data = graphing.gen_graph_data(pg, pos, gm.eigenvector_cent)
+
 data["node_colors"] = [round(i*100) for i in gm.eigenvector_cent.values()]
-graphing.plot_graph(data, label=label, title=title, save_path=f"{SESSION_PATH}/{name}", show_labels=False)
+graphing.plot_graph(data, label=label, title=title, figsize=graphing.FigSize.XXXL16_9, save_path=f"{SESSION_PATH}/{name}", show_labels=False)
 
 # %%
 
@@ -570,7 +575,7 @@ gm.diameter
 # %%
 nx.triadic_census(g)
 
-# %% jupyter={"outputs_hidden": true}
+# %%
 nx.triads_by_type(g)
 
 # %%

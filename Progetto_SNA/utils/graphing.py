@@ -96,12 +96,15 @@ def gen_graph_data(G, pos, metric):
     node_sizes = []
     data_alpha = []
     node_colors = []
-    min_metric = int(min(metric.values()))
-    max_metric = int(max(metric.values()))
+    min_metric = min(metric.values())
+    max_metric = max(metric.values())
+
+    def _era_facile(num, max_num):
+        return 100 * num / max_num
 
     for n in G.nodes():
-        node_sizes.append(90 + metric[n])
-        data_alpha.append(clamp(metric[n], min_metric, max_metric))
+        node_sizes.append(max(_era_facile(metric[n], max_metric), 30))
+        data_alpha.append(1)
         node_colors.append(metric[n])
 
     return {
@@ -147,32 +150,31 @@ def plot_graph(
     try:
         if figsize == FigSize.AUTO:
             n = data["G"].number_of_nodes()
-            avg_node_size = sum(data["node_sizes"]) / n
-            effective = n * avg_node_size
+            total_size = sum(data["node_sizes"])
 
             # this function is defined here becouse python has no proper lambda function support (no multiline)
             def _size(nodes):
                 match nodes:
-                    case v if v < 500:
+                    case v if v < 100:
                         return FigSize.XXS16_9
-                    case v if v < 1000:
+                    case v if v < 300:
                         return FigSize.XS16_9
-                    case v if v < 1500:
+                    case v if v < 500:
                         return FigSize.S16_9
-                    case v if v < 2000:
+                    case v if v < 600:
                         return FigSize.M16_9
-                    case v if v < 5000:
+                    case v if v < 700:
                         return FigSize.L16_9
-                    case v if v < 8000:
+                    case v if v < 800:
                         return FigSize.XL16_9
-                    case v if v < 10_000:
+                    case v if v < 1000:
                         return FigSize.XXL16_9
-                    case v if v < 15_000:
+                    case v if v < 1500:
                         return FigSize.XXXL16_9
                     case _:
                         return FigSize.XE16_9
 
-            figsize = _size(effective)
+            figsize = _size(n)
 
         plt.figure(figsize=figsize.value, dpi=dpi)
 
@@ -190,11 +192,11 @@ def plot_graph(
         nx.draw_networkx_edges(
             data["G"],
             data["pos"],
-            arrowstyle="-|>",
-            arrowsize=10,
-            edge_color="gray",
-            alpha=1,
-            width=0.1,
+            arrowstyle="->",
+            arrowsize=5,
+            edge_color="black",
+            alpha=0.7,
+            width=0.15,
         )
 
         if show_labels:
