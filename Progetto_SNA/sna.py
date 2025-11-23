@@ -8,9 +8,9 @@
 #       format_version: '1.3'
 #       jupytext_version: 1.18.1
 #   kernelspec:
-#     display_name: Python 3 (ipykernel)
+#     display_name: Python (data env)
 #     language: python
-#     name: python3
+#     name: data
 # ---
 
 # %% [markdown]
@@ -24,7 +24,6 @@ from importlib import reload
 from datetime import datetime
 from pathlib import Path
 from tqdm.notebook import tqdm
-from utils.graphing import FigSize, GLAYOUTS
 import utils.graphing as graphing
 import utils.metrics as metrics
 import networkx as nx
@@ -32,7 +31,6 @@ import os
 import pandas as pd
 import utils.preproc as preproc
 import warnings
-import ipdb
 
 
 CITATIONS_DIRECTED_GRAPH = "./data/cit-HepTh.txt"
@@ -60,7 +58,7 @@ os.makedirs(SESSION_PATH, exist_ok=True)
 session_id = "2511212247"  # RICARICA UNA SESSIONE
 SESSION_PATH = f"data/sessions/{session_id}"
 
-# %% [markdown]
+# %% [markdown] jp-MarkdownHeadingCollapsed=true
 # # Preprocessamento
 # eseguiamo le operazioni preliminari di caricamento dei dati
 #
@@ -146,9 +144,9 @@ citations_uni.dropna().sample(n=3)
 # %%
 citations_country.dropna().sample(n=3)
 
-# %% [markdown]
+# %% [markdown] jp-MarkdownHeadingCollapsed=true
 # # SALVATAGGIO o CARICAMENTO
-#
+# %% [markdown]
 # ## salvataggio
 # %%
 citations_uni.to_csv(f"{SESSION_PATH}/citations-uni.csv", index=False)
@@ -201,6 +199,7 @@ graphing.plot_graph(data, save_path=f"{SESSION_PATH}/{name}")
 # Posted by cdleary, modified by community. See post 'Timeline' for change history
 # Retrieved 2025-11-21, License - CC BY-SA 4.0
 from importlib import reload  # Python 3.4+
+
 graphing = reload(graphing)
 name = "graph-arf-wpg"
 pg = nx.DiGraph()
@@ -216,6 +215,7 @@ graphing.plot_graph(data, save_path=f"{SESSION_PATH}/{name}")
 # Posted by cdleary, modified by community. See post 'Timeline' for change history
 # Retrieved 2025-11-21, License - CC BY-SA 4.0
 from importlib import reload  # Python 3.4+
+
 graphing = reload(graphing)
 name = "graph-bfs"
 
@@ -232,6 +232,7 @@ graphing.plot_graph(data, save_path=f"{SESSION_PATH}/{name}")
 # Posted by cdleary, modified by community. See post 'Timeline' for change history
 # Retrieved 2025-11-21, License - CC BY-SA 4.0
 from importlib import reload  # Python 3.4+
+
 graphing = reload(graphing)
 name = "graph-bfs"
 pg = nx.DiGraph()
@@ -247,6 +248,7 @@ graphing.plot_graph(data, save_path=f"{SESSION_PATH}/{name}")
 # Posted by cdleary, modified by community. See post 'Timeline' for change history
 # Retrieved 2025-11-21, License - CC BY-SA 4.0
 from importlib import reload  # Python 3.4+
+
 graphing = reload(graphing)
 name = "kamada-wpg"
 pg = nx.DiGraph()
@@ -262,6 +264,7 @@ graphing.plot_graph(data, save_path=f"{SESSION_PATH}/{name}")
 # Posted by cdleary, modified by community. See post 'Timeline' for change history
 # Retrieved 2025-11-21, License - CC BY-SA 4.0
 from importlib import reload  # Python 3.4+
+
 graphing = reload(graphing)
 name = "planar"
 pg = nx.DiGraph()
@@ -277,6 +280,7 @@ graphing.plot_graph(data, save_path=f"{SESSION_PATH}/{name}")
 # Posted by cdleary, modified by community. See post 'Timeline' for change history
 # Retrieved 2025-11-21, License - CC BY-SA 4.0
 from importlib import reload  # Python 3.4+
+
 graphing = reload(graphing)
 name = "spring-base-wpg"
 pg = nx.DiGraph()
@@ -292,6 +296,7 @@ graphing.plot_graph(data, save_path=f"{SESSION_PATH}/{name}")
 # Posted by cdleary, modified by community. See post 'Timeline' for change history
 # Retrieved 2025-11-21, License - CC BY-SA 4.0
 from importlib import reload  # Python 3.4+
+
 graphing = reload(graphing)
 name = "spring-force-wpg"
 pg = nx.DiGraph()
@@ -307,6 +312,7 @@ graphing.plot_graph(data, save_path=f"{SESSION_PATH}/{name}")
 # Posted by cdleary, modified by community. See post 'Timeline' for change history
 # Retrieved 2025-11-21, License - CC BY-SA 4.0
 from importlib import reload  # Python 3.4+
+
 graphing = reload(graphing)
 name = "spring-energy-wpg"
 pg = nx.DiGraph()
@@ -322,6 +328,7 @@ graphing.plot_graph(data, save_path=f"{SESSION_PATH}/{name}", show_labels=False)
 # Posted by cdleary, modified by community. See post 'Timeline' for change history
 # Retrieved 2025-11-21, License - CC BY-SA 4.0
 from importlib import reload  # Python 3.4+
+
 graphing = reload(graphing)
 name = "spiral"
 pg = nx.DiGraph()
@@ -337,6 +344,7 @@ graphing.plot_graph(data, save_path=f"{SESSION_PATH}/{name}")
 # Posted by cdleary, modified by community. See post 'Timeline' for change history
 # Retrieved 2025-11-21, License - CC BY-SA 4.0
 from importlib import reload  # Python 3.4+
+
 graphing = reload(graphing)
 name = "spiral-equidistant"
 pg = nx.DiGraph()
@@ -350,23 +358,125 @@ graphing.plot_graph(data, save_path=f"{SESSION_PATH}/{name}")
 # %% [markdown]
 # Visualizzazione del grafo
 # %%
-unique = len(pd.unique(citations_uni[['source', 'target']].dropna().values.ravel('K')))
-self_loops = len(citations_uni[citations_uni['source'] == citations_uni["target"]].dropna())
+unique = len(pd.unique(citations_uni[["source", "target"]].dropna().values.ravel("K")))
+self_loops = len(
+    citations_uni[citations_uni["source"] == citations_uni["target"]].dropna()
+)
 edges = len(citations_uni.dropna())
 print(f"Abbiamo {unique} universita e centri di ricerca")
 print(f"        {edges} archi")
 print(f"        {self_loops} self loops")
 
 # %%
-unique = len(pd.unique(citations_country[['source', 'target']].dropna().values.ravel('K')))
-self_loops = len(citations_country[citations_country['source'] == citations_country["target"]].dropna())
+unique = len(
+    pd.unique(citations_country[["source", "target"]].dropna().values.ravel("K"))
+)
+self_loops = len(
+    citations_country[
+        citations_country["source"] == citations_country["target"]
+    ].dropna()
+)
 edges = len(citations_country.dropna())
 print(f"Abbiamo {unique} stati")
 print(f"        {edges} archi")
 print(f"        {self_loops} self loops")
 
 # %% [markdown]
-# ## Metriche
+# # GRAFI CON METRICHE
+# Prima di continuare, bisogna calcolare le metriche
+
+# %%
+# Source - https://stackoverflow.com/a/437591
+# Posted by cdleary, modified by community. See post 'Timeline' for change history
+# Retrieved 2025-11-21, License - CC BY-SA 4.0
+from importlib import reload  # Python 3.4+
+metrics = reload(metrics)
+graphing = reload(graphing)
+
+name = "spring-DEGREE"
+label = "Degree Centrality"
+title = "Spring Layout con Degree Centrality"
+
+pg = nx.DiGraph()
+graphing.add_edges(pg, citations_uni)
+lay = graphing.GLAYOUTS.spring
+pos = lay(pg, weight="w", method="energy")
+data = graphing.gen_graph_data(pg, pos, gm.degree_cent)
+gm = metrics.GraphMetrics(pg, SESSION_PATH)
+gm.calc_metrics()
+data["node_colors"] = [round(i*100) for i in gm.degree_cent.values()]
+graphing.plot_graph(data, label=label, title=title, save_path=f"{SESSION_PATH}/{name}", show_labels=False)
+
+# %%
+# Source - https://stackoverflow.com/a/437591
+# Posted by cdleary, modified by community. See post 'Timeline' for change history
+# Retrieved 2025-11-21, License - CC BY-SA 4.0
+from importlib import reload  # Python 3.4+
+metrics = reload(metrics)
+graphing = reload(graphing)
+
+name = "spring-CLOSENESS"
+label = "Closeness Centrality"
+title = "Spring Layout con Closeness Centrality"
+
+pg = nx.DiGraph()
+graphing.add_edges(pg, citations_uni)
+lay = graphing.GLAYOUTS.spring
+pos = lay(pg, weight="w", method="energy")
+data = graphing.gen_graph_data(pg, pos)
+gm = metrics.GraphMetrics(pg, SESSION_PATH)
+gm.calc_metrics()
+data["node_colors"] = [round(i*100) for i in gm.closeness_cent.values()]
+graphing.plot_graph(data, label=label, title=title, save_path=f"{SESSION_PATH}/{name}", show_labels=False)
+
+# %%
+# Source - https://stackoverflow.com/a/437591
+# Posted by cdleary, modified by community. See post 'Timeline' for change history
+# Retrieved 2025-11-21, License - CC BY-SA 4.0
+from importlib import reload  # Python 3.4+
+metrics = reload(metrics)
+graphing = reload(graphing)
+
+name = "spring-BETWEENNESS"
+label = "Betweenness Centrality"
+title = "Spring Layout con Betweenness Centrality"
+
+pg = nx.DiGraph()
+graphing.add_edges(pg, citations_uni)
+lay = graphing.GLAYOUTS.spring
+pos = lay(pg, weight="w", method="energy")
+data = graphing.gen_graph_data(pg, pos)
+gm = metrics.GraphMetrics(pg, SESSION_PATH)
+gm.calc_metrics()
+data["node_colors"] = [round(i*100) for i in gm.betweenness.values()]
+graphing.plot_graph(data, label=label, title=title, save_path=f"{SESSION_PATH}/{name}", show_labels=False)
+
+# %%
+# Source - https://stackoverflow.com/a/437591
+# Posted by cdleary, modified by community. See post 'Timeline' for change history
+# Retrieved 2025-11-21, License - CC BY-SA 4.0
+from importlib import reload  # Python 3.4+
+metrics = reload(metrics)
+graphing = reload(graphing)
+
+name = "spring-EIGENVECTOR"
+label = "Eigenvector Centrality"
+title = "Spring Layout con Eigenvector Centrality"
+
+pg = nx.DiGraph()
+graphing.add_edges(pg, citations_uni)
+lay = graphing.GLAYOUTS.spring
+pos = lay(pg, weight="w", method="energy")
+data = graphing.gen_graph_data(pg, pos)
+gm = metrics.GraphMetrics(pg, SESSION_PATH)
+gm.calc_metrics()
+data["node_colors"] = [round(i*100) for i in gm.eigenvector_cent.values()]
+graphing.plot_graph(data, label=label, title=title, save_path=f"{SESSION_PATH}/{name}", show_labels=False)
+
+# %%
+
+# %% [markdown]
+# # Metriche
 #
 # Qua calcoliamo:
 # - closeness centrality
@@ -394,16 +504,73 @@ metrics = reload(metrics)
 # %%
 g = nx.DiGraph()
 graphing.add_edges(g, citations_uni)
-wg = g.copy()
-wg = graphing.edge_collapse(g, nx.DiGraph)
+
+gm = metrics.GraphMetrics(g, SESSION_PATH)
+gm.calc_metrics()
+
+# %% jupyter={"outputs_hidden": true}
+gm.plot_distribution(gm.degree_cent.values(), "Degree Centrality Distribuition", 0.80)
+
+# %% jupyter={"outputs_hidden": true}
+gm.plot_distribution( gm.closeness_cent.values(), "Closeness Centrality Distribuition", 0.80)
+
+# %% jupyter={"outputs_hidden": true}
+gm.plot_distribution( gm.betweenness_cent.values(), "Betweenness Centrality Distribuition", 0.033)
 
 # %%
-gm  = metrics.calc_metrics(g)
-wgm = metrics.calc_metrics(wg)
+max(gm.betweenness_cent.values())
 
 # %%
-metrics.plot_distribution(list(gm[0].values()), SESSION_PATH, "Degree Centrality Distribuition - Unweighted Graph")
+max(gm.eigenvector_cent.values())
+
+# %% jupyter={"outputs_hidden": true}
+gm.plot_distribution( gm.eigenvector_cent.values(), "Eigenvector Centrality Distribuition", 0.15)
 
 # %%
-list(gm[0].values())
-gm[0].values().
+max(gm.indegree.values())
+
+# %% jupyter={"outputs_hidden": true}
+gm.plot_distribution(gm.indegree.values(), "Indegree Distribuition", 0.65)
+# %%
+max(gm.outdegree.values())
+
+# %% jupyter={"outputs_hidden": true}
+gm.plot_distribution(gm.outdegree.values(), "Outdegree Distribuition", 0.85)
+
+# %%
+max(gm.clustering_coef.values())
+
+# %% jupyter={"outputs_hidden": true}
+gm.plot_distribution(gm.clustering_coef.values(), "Clustering Distribution", 1)
+
+# %%
+max(gm.pagerank.values())
+
+# %% jupyter={"outputs_hidden": true}
+gm.plot_distribution(gm.pagerank.values(), "Pagerank Distribution", 0.02)
+
+# %%
+max(gm.k_core.values())
+
+# %% jupyter={"outputs_hidden": true}
+gm.plot_distribution(gm.k_core.values(), "K-Core Distribution", 97)
+
+# %%
+gm.density
+
+# %%
+gm.reciprocity
+
+# %%
+gm.diameter
+
+# %% [markdown]
+# ## Triadi
+
+# %%
+nx.triadic_census(g)
+
+# %% jupyter={"outputs_hidden": true}
+nx.triads_by_type(g)
+
+# %%

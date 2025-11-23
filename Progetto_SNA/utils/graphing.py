@@ -86,25 +86,28 @@ def clamp(value, min_value, max_value):
     return max(min(int(value), max_value), min_value)
 
 
-def gen_graph_data(G, pos):
+def gen_graph_data(G, pos, metric):
     if not pos:
         pos = GLAYOUTS.kamada(G)
 
-    degrees = dict(G.degree())
+    if not metric:
+        metric = dict(G.degree())
+
     node_sizes = []
     data_alpha = []
     node_colors = []
-    min_degrees = int(min(degrees.values()))
-    max_degrees = int(max(degrees.values()))
+    min_metric = int(min(metric.values()))
+    max_metric = int(max(metric.values()))
+
     for n in G.nodes():
-        node_sizes.append(90 + degrees[n])
-        data_alpha.append(clamp(degrees[n], min_degrees, max_degrees))
-        node_colors.append(degrees[n])
+        node_sizes.append(90 + metric[n])
+        data_alpha.append(clamp(metric[n], min_metric, max_metric))
+        node_colors.append(metric[n])
 
     return {
         "G": G,
         "pos": pos,
-        "degrees": degrees,
+        "degrees": metric,
         "node_sizes": node_sizes,
         "node_colors": node_colors,
         "alpha": data_alpha,
@@ -138,6 +141,7 @@ def plot_graph(
     save_path=None,
     show_labels=False,
     title="Graph",
+    label="Label",
     opts={},
 ):
     try:
@@ -199,7 +203,7 @@ def plot_graph(
             )
 
         cbar = plt.colorbar(nodes)
-        cbar.set_label("Node degree")
+        cbar.set_label(f"{label}")
 
         if title:
             plt.title(title)
@@ -215,9 +219,10 @@ def plot_graph(
         print(e)
 
 
-def add_edges(G, df):
-    for _, row in df.dropna().iterrows():
-        G.add_edge(row["source"], row["target"])
+def add_edges(G: nx.Graph, df):
+    # for _, row in df.dropna().iterrows():
+    #     G.add_edge(row["source"], row["target"])
+    G.add_edges_from(list(df.itertuples(index=False)))
 
 
 def edge_collapse(G, type: Callable = nx.MultiDiGraph):

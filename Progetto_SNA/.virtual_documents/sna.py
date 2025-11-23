@@ -147,7 +147,7 @@ papers = pd.read_csv(f"{SESSION_PATH}/papers.csv")
 
 
 
-# per testing e sviluppo delle librerire, rilanciare questo blocco ogni volta che viene
+# per testing e sviluppo delle librerie, rilanciare questo blocco ogni volta che viene
 # aggiornata una libreria
 
 # Source - https://stackoverflow.com/a/437591
@@ -163,8 +163,8 @@ graphing = reload(graphing)
 
 name = "circular-wpg"
 pg = nx.DiGraph()
-add_edges(pg, citations_uni)
-wpg = edge_collapse(pg, nx.DiGraph)
+graphing.add_edges(pg, citations_uni)
+wpg = graphing.edge_collapse(pg, nx.DiGraph)
 lay = graphing.GLAYOUTS.circular
 pos = lay(wpg)
 data = graphing.gen_graph_data(wpg, pos)
@@ -181,8 +181,8 @@ from importlib import reload  # Python 3.4+
 graphing = reload(graphing)
 name = "graph-arf-wpg"
 pg = nx.DiGraph()
-add_edges(pg, citations_uni)
-wpg = edge_collapse(pg, nx.DiGraph)
+graphing.add_edges(pg, citations_uni)
+wpg = graphing.edge_collapse(pg, nx.DiGraph)
 lay = graphing.GLAYOUTS.arf
 pos = lay(wpg)
 data = graphing.gen_graph_data(wpg, pos)
@@ -197,8 +197,8 @@ graphing = reload(graphing)
 name = "graph-bfs"
 
 pg = nx.DiGraph()
-add_edges(pg, citations_uni)
-wpg = edge_collapse(pg, nx.DiGraph)
+graphing.add_edges(pg, citations_uni)
+wpg = graphing.edge_collapse(pg, nx.DiGraph)
 lay = graphing.GLAYOUTS.bipartite
 pos = lay(pg)
 data = graphing.gen_default(pg, pos)
@@ -212,8 +212,8 @@ from importlib import reload  # Python 3.4+
 graphing = reload(graphing)
 name = "graph-bfs"
 pg = nx.DiGraph()
-add_edges(pg, citations_uni)
-wpg = edge_collapse(pg, nx.DiGraph)
+graphing.add_edges(pg, citations_uni)
+wpg = graphing.edge_collapse(pg, nx.DiGraph)
 lay = graphing.GLAYOUTS.bfs
 pos = lay(pg)
 data = graphing.gen_default(pg, pos)
@@ -227,8 +227,8 @@ from importlib import reload  # Python 3.4+
 graphing = reload(graphing)
 name = "kamada-wpg"
 pg = nx.DiGraph()
-add_edges(pg, citations_uni)
-wpg = edge_collapse(pg, nx.DiGraph)
+graphing.add_edges(pg, citations_uni)
+wpg = graphing.edge_collapse(pg, nx.DiGraph)
 lay = graphing.GLAYOUTS.kamada
 pos = lay(wpg, weight="w")
 data = graphing.gen_graph_data(wpg, pos)
@@ -242,8 +242,8 @@ from importlib import reload  # Python 3.4+
 graphing = reload(graphing)
 name = "planar"
 pg = nx.DiGraph()
-add_edges(pg, citations_uni)
-wpg = edge_collapse(pg, nx.DiGraph)
+graphing.add_edges(pg, citations_uni)
+wpg = graphing.edge_collapse(pg, nx.DiGraph)
 lay = graphing.GLAYOUTS.planar
 pos = lay(pg)
 data = graphing.gen_default(pg, pos)
@@ -257,8 +257,8 @@ from importlib import reload  # Python 3.4+
 graphing = reload(graphing)
 name = "spring-base-wpg"
 pg = nx.DiGraph()
-add_edges(pg, citations_uni)
-wpg = edge_collapse(pg, nx.DiGraph)
+graphing.add_edges(pg, citations_uni)
+wpg = graphing.edge_collapse(pg, nx.DiGraph)
 lay = graphing.GLAYOUTS.spring
 pos = lay(wpg, weight="w")
 data = graphing.gen_graph_data(wpg, pos)
@@ -272,8 +272,8 @@ from importlib import reload  # Python 3.4+
 graphing = reload(graphing)
 name = "spring-force-wpg"
 pg = nx.DiGraph()
-add_edges(pg, citations_uni)
-wpg = edge_collapse(pg, nx.DiGraph)
+graphing.add_edges(pg, citations_uni)
+wpg = graphing.edge_collapse(pg, nx.DiGraph)
 lay = graphing.GLAYOUTS.spring
 pos = lay(wpg, weight="w", method="force")
 data = graphing.gen_graph_data(wpg, pos)
@@ -287,8 +287,8 @@ from importlib import reload  # Python 3.4+
 graphing = reload(graphing)
 name = "spring-energy-wpg"
 pg = nx.DiGraph()
-add_edges(pg, citations_uni)
-wpg = edge_collapse(pg, nx.DiGraph)
+graphing.add_edges(pg, citations_uni)
+wpg = graphing.edge_collapse(pg, nx.DiGraph)
 lay = graphing.GLAYOUTS.spring
 pos = lay(wpg, weight="w", method="energy")
 data = graphing.gen_graph_data(wpg, pos)
@@ -302,8 +302,8 @@ from importlib import reload  # Python 3.4+
 graphing = reload(graphing)
 name = "spiral"
 pg = nx.DiGraph()
-add_edges(pg, citations_uni)
-wpg = edge_collapse(pg, nx.DiGraph)
+graphing.add_edges(pg, citations_uni)
+wpg = graphing.edge_collapse(pg, nx.DiGraph)
 lay = graphing.GLAYOUTS.spiral
 pos = lay(pg, resolution=1)
 data = graphing.gen_graph_data(pg, pos)
@@ -317,8 +317,8 @@ from importlib import reload  # Python 3.4+
 graphing = reload(graphing)
 name = "spiral-equidistant"
 pg = nx.DiGraph()
-add_edges(pg, citations_uni)
-wpg = edge_collapse(pg, nx.DiGraph)
+graphing.add_edges(pg, citations_uni)
+wpg = graphing.edge_collapse(pg, nx.DiGraph)
 lay = graphing.GLAYOUTS.spiral
 pos = lay(pg, resolution=1, equidistant=True)
 data = graphing.gen_graph_data(pg, pos)
@@ -344,32 +344,43 @@ print(f"        {edges} archi")
 print(f"        {self_loops} self loops")
 
 
-citations_uni.count()
 
 
 
 
 
 
+# per testing e sviluppo delle librerie, rilanciare questo blocco ogni volta che viene
+# aggiornata una libreria
+
+# Source - https://stackoverflow.com/a/437591
+# Posted by cdleary, modified by community. See post 'Timeline' for change history
+# Retrieved 2025-11-21, License - CC BY-SA 4.0
 
 
-
+metrics = reload(metrics)
 
 
 
 
 
 g = nx.DiGraph()
-add_edges(g, citations_uni)
-wg = g.copy()
-wg = edge_collapse(g, nx.DiGraph)
+graphing.add_edges(g, citations_uni)
 
 
-wgm = metrics(wg)
-gm  = metrics(g)
+gm  = metrics.calc_metrics(g)
 
 
+metrics.plot_distribution(list(gm[0].values()), SESSION_PATH, "Degree Centrality Distribuition", 0.80)
 
+
+metrics.plot_distribution(list(gm[1].values()), SESSION_PATH, "Closeness Centrality Distribuition", 0.80)
+
+
+metrics.plot_distribution(list(gm[2].values()), SESSION_PATH, "Betweenness Centrality Distribuition", 0.02)
+
+
+metrics.plot_distribution(list(gm[3].values()), SESSION_PATH, "Eigenvector Centrality Distribuition", 0.1)
 
 
 
