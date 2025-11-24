@@ -1,10 +1,15 @@
 from enum import Enum
 from dataclasses import dataclass
-
-from numpy import log
-from typing import Callable
+import pandas as pd
+import traceback
+from networkx.algorithms import boundary
+from numpy import log, nan
+from typing import Callable, Iterable
 import networkx as nx
+import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.colors import BoundaryNorm
+from matplotlib import colormaps
 from enum import Enum
 
 
@@ -30,26 +35,28 @@ class FigSize(Enum):
     XXXL1_1 = PixToInch(10000, 10000, _dpi)
     ENORMOUS1_1 = PixToInch(15000, 15000, _dpi)
     XE1_1 = PixToInch(50000, 50000, _dpi)
-    XXS16_9 = (1.7, 0.9)  #  500 × 281
-    XS16_9 = (3.3, 1.9)  # 1000 × 562
-    S16_9 = (5.0, 2.8)  # 1500 × 844
-    M16_9 = (6.7, 3.4)  # 2000 × 1125
-    L16_9 = (8.3, 4.2)  # 2500 × 1406
-    XL16_9 = (10.0, 5.0)  # 3000 × 1688
-    XXL16_9 = (11.7, 5.9)  # 3500 × 1969
-    XXXL16_9 = (13.3, 6.8)  # 4000 × 2250
-    ENORMOUS16_9 = (16.7, 9.4)  # 5000 × 2812
-    XE16_9 = (33.3, 18.8)  # 10000 × 5625
-    XXS4_3 = (1.7, 1.3)  #  500 × 375
-    XS4_3 = (3.3, 2.5)  # 1000 × 750
-    S4_3 = (5.0, 3.8)  # 1500 × 1125
-    M4_3 = (6.7, 5.0)  # 2000 × 1500
-    L4_3 = (8.3, 6.3)  # 2500 × 1875
-    XL4_3 = (10.0, 7.5)  # 3000 × 2250
-    XXL4_3 = (11.7, 8.8)  # 3500 × 2625
-    XXXL4_3 = (13.3, 10.0)  # 4000 × 3000
-    ENORMOUS4_3 = (16.7, 12.5)  # 5000 × 3750
-    XE4_3 = (33.3, 25.0)  # 10000 × 7500
+
+    XXS16_9 = PixToInch(500, 281, _dpi)
+    XS16_9 = PixToInch(1000, 562, _dpi)
+    S16_9 = PixToInch(1500, 844, _dpi)
+    M16_9 = PixToInch(2000, 1125, _dpi)
+    L16_9 = PixToInch(2500, 1406, _dpi)
+    XL16_9 = PixToInch(3000, 1688, _dpi)
+    XXL16_9 = PixToInch(3500, 1969, _dpi)
+    XXXL16_9 = PixToInch(4000, 2250, _dpi)
+    ENORMOUS16_9 = PixToInch(5000, 2812, _dpi)
+    XE16_9 = PixToInch(10000, 5625, _dpi)
+
+    XXS4_3 = PixToInch(500, 375, _dpi)
+    XS4_3 = PixToInch(1000, 750, _dpi)
+    S4_3 = PixToInch(1500, 1125, _dpi)
+    M4_3 = PixToInch(2000, 1500, _dpi)
+    L4_3 = PixToInch(2500, 1875, _dpi)
+    XL4_3 = PixToInch(3000, 2250, _dpi)
+    XXL4_3 = PixToInch(3500, 2625, _dpi)
+    XXXL4_3 = PixToInch(4000, 3000, _dpi)
+    ENORMOUS4_3 = PixToInch(5000, 3750, _dpi)
+    XE4_3 = PixToInch(10000, 7500, _dpi)
 
 
 class GLAYOUTS(Enum):
@@ -86,12 +93,26 @@ def clamp(value, min_value, max_value):
     return max(min(int(value), max_value), min_value)
 
 
-def gen_graph_data(G, pos, metric):
+def gen_graph_data(G, pos, metric, log_distances=False):
     if not pos:
         pos = GLAYOUTS.kamada(G)
-
     if not metric:
         metric = dict(G.degree())
+
+    # Apply logarithmic transformation to distances if requested
+    if log_distances:
+        center = np.array([0, 0])
+        pos_transformed = {}
+        for node, coord in pos.items():
+            coord_array = np.array(coord)
+            distance = np.linalg.norm(coord_array - center)
+            if distance > 0:
+                direction = (coord_array - center) / distance
+                log_distance = np.log1p(distance)
+                pos_transformed[node] = tuple(center + direction * log_distance)
+            else:
+                pos_transformed[node] = coord
+        pos = pos_transformed
 
     node_sizes = []
     data_alpha = []
@@ -99,11 +120,13 @@ def gen_graph_data(G, pos, metric):
     min_metric = min(metric.values())
     max_metric = max(metric.values())
 
+    non = G.number_of_nodes()
+
     def _era_facile(num, max_num):
-        return 100 * num / max_num
+        return 100 * num / max_num * (30 + non / 10)
 
     for n in G.nodes():
-        node_sizes.append(max(_era_facile(metric[n], max_metric), 30))
+        node_sizes.append(max(_era_facile(metric[n], max_metric), 30 + non / 10))
         data_alpha.append(1)
         node_colors.append(metric[n])
 
@@ -111,25 +134,11 @@ def gen_graph_data(G, pos, metric):
         "G": G,
         "pos": pos,
         "degrees": metric,
+        "metric": metric,
         "node_sizes": node_sizes,
         "node_colors": node_colors,
         "alpha": data_alpha,
         "cmap": CMAP.COOLWARM,
-    }
-
-
-def gen_graph_distance(G):
-    pos = GLAYOUTS.spring(G, weight="weight", k=None, iterations=200)
-    degrees = dict(G.degree())
-    node_sizes = [80 + log(degrees[n] * 10) for n in G.nodes()]
-    node_colors = [degrees[n] for n in G.nodes()]
-    return {
-        "G": G,
-        "pos": pos,
-        "degrees": degrees,
-        "node_sizes": node_sizes,
-        "node_colors": node_colors,
-        "cmap": CMAP.INFERNO,
     }
 
 
@@ -148,34 +157,32 @@ def plot_graph(
     opts={},
 ):
     try:
+        n = data["G"].number_of_nodes()
         if figsize == FigSize.AUTO:
-            n = data["G"].number_of_nodes()
-            total_size = sum(data["node_sizes"])
+            avg = sum(data["node_sizes"]) / n
+            density = n / avg
+            print(f"{density}")
 
             # this function is defined here becouse python has no proper lambda function support (no multiline)
             def _size(nodes):
                 match nodes:
-                    case v if v < 100:
-                        return FigSize.XXS16_9
-                    case v if v < 300:
-                        return FigSize.XS16_9
-                    case v if v < 500:
-                        return FigSize.S16_9
-                    case v if v < 600:
+                    case v if v < 0.5:
                         return FigSize.M16_9
-                    case v if v < 700:
+                    case v if v < 0.6:
                         return FigSize.L16_9
-                    case v if v < 800:
+                    case v if v < 0.7:
                         return FigSize.XL16_9
-                    case v if v < 1000:
+                    case v if v < 0.8:
                         return FigSize.XXL16_9
-                    case v if v < 1500:
+                    case v if v < 1:
                         return FigSize.XXXL16_9
                     case _:
                         return FigSize.XE16_9
 
-            figsize = _size(n)
+            figsize = _size(density)
 
+        print(figsize)
+        edge_colors = range(2, n + 2)
         plt.figure(figsize=figsize.value, dpi=dpi)
 
         nodes = nx.draw_networkx_nodes(
@@ -192,10 +199,9 @@ def plot_graph(
         nx.draw_networkx_edges(
             data["G"],
             data["pos"],
-            arrowstyle="->",
             arrowsize=5,
-            edge_color="black",
-            alpha=0.7,
+            edge_color="gray",
+            alpha=0.5,
             width=0.15,
         )
 
@@ -207,6 +213,21 @@ def plot_graph(
         cbar = plt.colorbar(nodes)
         cbar.set_label(f"{label}")
 
+        # all_values = data["metric"].values
+        #
+        # step = 0.1
+        # steps = 5
+        #
+        # boundaries = [a * step for a in range(0, round(steps) + 1)]
+        #
+        # cmap = plt.cm.inferno
+        # norm = BoundaryNorm(boundaries, cmap.N)
+        #
+        # img = plt.imshow([[0, 1], [2, 3]], cmap=cmap, norm=norm)
+        #
+        # cbar = plt.colorbar(img)
+        # cbar.boundaries = boundaries
+
         if title:
             plt.title(title)
 
@@ -217,8 +238,8 @@ def plot_graph(
             plt.savefig(save_path, dpi=dpi, bbox_inches="tight")
 
         plt.show()
-    except Exception as e:
-        print(e)
+    except Exception:
+        print(traceback.format_exc())
 
 
 def add_edges(G: nx.Graph, df):
@@ -227,7 +248,20 @@ def add_edges(G: nx.Graph, df):
     G.add_edges_from(list(df.itertuples(index=False)))
 
 
-def edge_collapse(G, type: Callable = nx.MultiDiGraph):
+def add_edges_with_weight(G: nx.Graph, df):
+    for src, dst in df.itertuples(index=False):
+        if pd.isna(src):
+            src = "other"
+        if pd.isna(dst):
+            dst = "other"
+
+        if G.has_edge(src, dst):
+            G[src][dst]["weight"] += 1
+        else:
+            G.add_edge(src, dst, weight=1)
+
+
+def edge_collapse(G: nx.MultiGraph, type: Callable = nx.MultiDiGraph):
     H = type()
     for u, v in G.edges():
         if H.has_edge(u, v):
