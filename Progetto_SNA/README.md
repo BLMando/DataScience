@@ -1,4 +1,3 @@
-# jupytext
+O NON si pusha .ipynb (e quindi si usa jupytext per convertire notebook in .py)
 
-usare jupytext per sincronizzare i notebook poichè questi possono pesare TROPPO.
-Jupytext trasforma un notebook in un file .py.
+OPPURE prima di COMMITTARE si fa un bel "Delete Outputs from all Cells"
