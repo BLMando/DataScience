@@ -8,9 +8,9 @@
 #       format_version: '1.3'
 #       jupytext_version: 1.18.1
 #   kernelspec:
-#     display_name: Python (data env)
+#     display_name: Python 3 (ipykernel)
 #     language: python
-#     name: data
+#     name: python3
 # ---
 
 # %% [markdown]
@@ -34,7 +34,7 @@ import warnings
 import math
 
 
-CITATIONS_DIRECTED_GRAPH = "./data/cit-HepTh.txt"
+CITATIONS_DIRECTED_GRAPH = "./data/cit-HepTG.txt"
 CITATIONS_ABSTRACTS_DIR = "./data/cit-HepTh-abstracts"
 
 ROR_DATA = "./data/ror-data.csv"
@@ -112,7 +112,7 @@ cit_hepth = pd.read_csv(
 )
 
 # Prendiamo le prime due colonne come source/target
-citations = cit_hepth.iloc[:, :2].copy()
+citations = cit_heptG.iloc[:, :2].copy()
 citations.columns = ["source", "target"]
 citations["source"] = pd.to_numeric(citations["source"])
 citations["target"] = pd.to_numeric(citations["target"])
@@ -186,7 +186,7 @@ print(f"Abbiamo {unique} universita e centri di ricerca")
 print(f"        {edges} archi")
 print(f"        {self_loops} self loops")
 
-# %% [markdown]
+# %% [markdown] jp-MarkdownHeadingCollapsed=true
 # # Grafi
 
 # %% [markdown]
@@ -253,7 +253,7 @@ pos = lay(wpg, weight="w")
 data = graphing.gen_graph_data(wpg, pos)
 graphing.plot_graph(data, save_path=f"{SESSION_PATH}/{name}")
 
-# %% [markdown] jp-MarkdownHeadingCollapsed=true
+# %% [markdown]
 # ### Spring
 
 # %% [markdown]
@@ -318,6 +318,34 @@ graphing.plot_graph(data, save_path=f"{SESSION_PATH}/{name}", show_labels=False)
 # %% [markdown] jp-MarkdownHeadingCollapsed=true
 # ## Grafi e metriche con NaN 
 # Prima di continuare, bisogna calcolare le metriche
+
+# %%
+gm = metrics.GraphMetrics(pg, SESSION_PATH)
+gm.calc_metrics()
+
+# %%
+degree_df = pd.DataFrame(gm.degree_cent.items(), columns=['Node', 'DegreeCentrality'])
+
+print(degree_df.sort_values(by='DegreeCentrality', ascending=False).head(11))
+print(degree_df.sort_values(by='DegreeCentrality', ascending=True).head(10))
+
+# %%
+closeness_df = pd.DataFrame(gm.closeness_cent.items(), columns=['Node', 'ClosenessCentrality'])
+
+print(closeness_df.sort_values(by='ClosenessCentrality', ascending=False).head(11))
+print(closeness_df.sort_values(by='ClosenessCentrality', ascending=True).head(10))
+
+# %%
+betweenness_df = pd.DataFrame(gm.betweenness_cent.items(), columns=['Node', 'BetweennessCentrality'])
+
+print(betweenness_df.sort_values(by='BetweennessCentrality', ascending=False).head(11))
+print(betweenness_df.sort_values(by='BetweennessCentrality', ascending=True).head(10))
+
+# %%
+eigenvector_df = pd.DataFrame(gm.eigenvector_cent.items(), columns=['Node', 'EigenvectorCentrality'])
+
+print(eigenvector_df.sort_values(by='EigenvectorCentrality', ascending=False).head(11))
+print(eigenvector_df.sort_values(by='EigenvectorCentrality', ascending=True).head(10))
 
 # %%
 gm = metrics.GraphMetrics(pg, SESSION_PATH)
@@ -442,7 +470,7 @@ data = graphing.gen_graph_data(pg, pos, gm.eigenvector_cent)
 data["node_colors"] = [round(i*100) for i in gm.eigenvector_cent.values()]
 graphing.plot_graph(data, label=label, title=title, figsize=graphing.FigSize.XXXL16_9, save_path=f"{SESSION_PATH}/{name}", show_labels=False)
 
-# %% [markdown]
+# %% [markdown] jp-MarkdownHeadingCollapsed=true
 # ## Grafi e metriche senza NaN 
 # Prima di continuare, bisogna calcolare le metriche
 
@@ -451,7 +479,7 @@ G = g.copy()
 nan_nodes = []
 limit = None
 for node in G.nodes():
-    if not isinstance(node, str) and math.isnan(node):
+    if not isinstance(node, str) and matG.isnan(node):
         nan_nodes.append(node)
 G.remove_nodes_from(nan_nodes)
 
@@ -550,7 +578,7 @@ graphing.plot_graph(data,
                     show_labels=False
                    )
 
-# %% [markdown]
+# %% [markdown] jp-MarkdownHeadingCollapsed=true
 # # Metriche
 #
 # Qua calcoliamo:
@@ -559,7 +587,7 @@ graphing.plot_graph(data,
 # - betweenness centrality
 # - eigenvector centrality
 
-# %% [markdown]
+# %% [markdown] jp-MarkdownHeadingCollapsed=true
 # ### Definizione funzioni
 
 # %%
@@ -573,7 +601,7 @@ graphing.plot_graph(data,
 
 metrics = reload(metrics)
 
-# %% [markdown]
+# %% [markdown] jp-MarkdownHeadingCollapsed=true
 # ### Calcolo Metriche
 
 # %%
@@ -641,7 +669,7 @@ networkx parallel edges collpase weightgm.reciprocity
 gm.diameter
 
 
-# %% [markdown] jp-MarkdownHeadingCollapsed=true
+# %% [markdown]
 # ## Triadi
 
 # %% [markdown]
@@ -675,7 +703,7 @@ if tris_nodes:
 G = g.copy()
 nan_nodes = []
 for node in G.nodes(): 
-    if not isinstance(node, str) and math.isnan(node):
+    if not isinstance(node, str) and matG.isnan(node):
         nan_nodes.append(node)
 G.remove_nodes_from(nan_nodes)
 
@@ -742,12 +770,15 @@ H = nx.Graph()
 graphing.add_edges_with_weight(H, citations_uni)
 
 # %%
-for n in H.nodes:
-    H.nodes[n]["weight"] = H.degree(n)
+G.remove_nodes_from(["other"])
 
 # %%
-for n in H.nodes:
-    H.nodes[n]["weight"] = 1
+for n in G.nodes:
+    G.nodes[n]["weight"] = G.degree(n)
+
+# %%
+for n in G.nodes:
+    G.nodes[n]["weight"] = 1
 
 # %%
 maximal = 0
@@ -760,18 +791,186 @@ allc = 0
 for i in nx.find_cliques(H):
     maximal += 1
     
-maxn, maxc = nx.max_weight_clique(H)
+maxc, maxn = nx.max_weight_clique(H)
 
 
 print(f"clique trovate {allc}")
 print(f"clique massimali trovate {maximal}")
-print(f"clique massima: {maxc}")
+print(f"clique massima: {maxn} (peso, dove il peso è il degree dei nodi)")
+print(f"       numero di nodi nella massimale {len(maxc)}")
+
+# %% [markdown]
+# Possiamo già notare che la clique massimale ha un peso totale interessante per essere composta da "soli" 45 nodi. Il sospetto è che nella clique sia presente (ovviamente) il nodo "other".
+
+# %%
+for i in maxc:
+    print(i)
+
+# %% [markdown]
+# provando a rimuovere dal grafo il nodo "other" notiamo se ci sono differenze
+
+# %%
+graphing = reload(graphing)
+H = nx.Graph()
+graphing.add_edges_with_weight(H, citations_uni, with_nan=False)
+for n in G.nodes:
+    G.nodes[n]["weight"] = G.degree(n)
+
+# %%
+maximal = 0
+allc = 0
+
+
+
+for i in nx.find_cliques(H):
+    maximal += 1
+    
+maxc, maxn = nx.max_weight_clique(H)
+
+
+print(f"clique trovate {allc}")
+print(f"clique massimali trovate {maximal}")
+print(f"clique massima: {maxn} (peso, dove il peso è il degree dei nodi)")
+print(f"       numero di nodi nella massimale {len(maxc)}")
+
+# %%
+for i in maxc:
+    print(i)
+
+# %% [markdown]
+# e pare che cambi solo il punteggio, ma la clique rimane quella.
+# Tuttavia il numero di clique massimali ci fa intuire che quello è il minimo numero di clique che possiamo trovare.
+# Cercare il massimo, ovviamente, non è pensabile in quanto le risorse computazionali per farlo sono eccessive, ed onestamente inutili (non ci porta informazione).
 
 # %%
 nx.node_clique_number(H)
 
+
 # %%
-graphing.edge_collapse()
-nx.max_weight_clique(H)
+
+# %% [markdown]
+# bisogna fare anche K-core
+
+# %% [markdown]
+# # Communities
+
+# %% [markdown]
+# ATTENZIONE: Grafo H SENZA Nan, Grafo G CON Nan
+
+# %%
+def weight_nodes(G):
+    for n in G.nodes:
+        G.nodes[n]["weight"] = G.degree(n)
+
+
+# %%
+def comm_metrics(S, comm):
+    print(f"comunità: {len(comm)}")
+    for i, c in enumerate(comm):
+        mean_degree = sum([S.nodes()[node]["weight"] for node in c]) / len(c)
+        print(f"      community #{i}: {len(c)}")
+        print(f"           mean_deg: {round(mean_degree)}")
+        print("")
+    print("")
+    print(f"totale nodi in una comunità {sum([len(c) for c in comm])}")
+    print(f"totale nodi nel grafo {S.number_of_nodes()}")
+
+
+# %%
+H = nx.DiGraph()
+G = nx.DiGraph()
+graphing.add_edges_with_weight(H, citations_uni, with_nan=False) # ci sono nodi che si collegano solo a NaN
+graphing.add_edges_with_weight(G, citations_uni, with_nan=True)
+weight_nodes(H)
+weight_nodes(G)
+
+# %% [markdown]
+# Scegliere un algoritmo e poi procedere
+
+# %%
+result = nx.community.girvan_newman(H)
+communities = next(result)
+communities = next(result)
+communities = next(result)
+
+
+# %%
+len(communities)
+
+# %%
+communities_H = sorted(nx.community.louvain_communities(H), key=len, reverse=True)
+communities_G = sorted(nx.community.louvain_communities(G), key=len, reverse=True)
+
+# %% [markdown]
+# non dimenticare di eseguire anche questo
+
+# %%
+graphing.set_node_community(H, communities_H)
+graphing.set_edge_community(H)
+graphing.set_node_community(G, communities_G)
+graphing.set_edge_community(G)
+
+# %%
+communities_H
+
+# %%
+print("H - senza NaN".center(50, '-'))
+comm_metrics(H, communities_H)
+print("G - con NaN".center(50,'-'))
+comm_metrics(G, communities_G)
+
+# %%
+node_color = [graphing.get_color(H.nodes[v]['community']) for v in H.nodes]
+# Set community color for edges between members of the same community (internal) and intra-community edges (external)
+external = [(v, w) for v, w in H.edges if H.edges[v, w]['community'] == 0]
+internal = [(v, w) for v, w in H.edges if H.edges[v, w]['community'] > 0]
+internal_color = ['black' for e in internal]
+
+# %%
+sizes = [H.nodes[s]['weight'] + 300 for s in H.nodes]
+
+# %%
+graphing = reload(graphing)
+
+pos = nx.spring_layout(H, k=0.8, iterations=100)
+graphing.plot_community(
+    H,
+    pos,
+    community_colors=node_color,
+    external=external,
+    internal=internal,
+    internal_color=internal_color,
+    name="cazzo",
+    node_size=sizes,
+    figsize=graphing.FigSize.XE16_9
+)
+
+# %%
+graphing = reload(graphing)
+graphing.one_by_one_communities(H, communities_H)
+
+# %%
+graphing = reload(graphing)
+graphing.incremental_communities(H, communities_H)
+
+# %%
+graphing = reload(graphing)
+
+U = nx.Graph()
+graphing.add_edges_with_weight(U, citations_uni)
+
+U.remove_edges_from(nx.selfloop_edges(U))
+
+#for i in range (1,80):
+#    print(f"{i} {len(nx.k_core(U, i).nodes)}")
+
+# Create k-core subgraph
+k_core = 62
+K = nx.k_core(U, k_core)
+
+title = f"Main Core (k = {k_core})"
+
+graphing.plot_k_core_graph(K, title=title, figsize=graphing.FigSize.XE16_9, save_path=f"{SESSION_PATH}/{title}")
+
 
 # %%
