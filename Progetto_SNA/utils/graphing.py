@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import BoundaryNorm
 from matplotlib import colormaps
 from enum import Enum
-
+import random
 
 def _to_inch(n, dpi=300) -> float:
     return round(n / dpi, 1)
@@ -406,10 +406,13 @@ def _graph_comm_preproc(G: nx.Graph):
 
 
 def one_by_one_communities(G: nx.Graph, comms, k=0.8, iterations=50):
+
+    pos = nx.spring_layout(G, k=k, iterations=iterations)
+
     gs = extract_communities_sub_graph(G, comms)
     for i, g in enumerate(gs):
         ncolor, exte, inte, sizes, intec = _graph_comm_preproc(g)
-        pos = nx.spring_layout(g, k=k, iterations=iterations)
+
         plot_community(
             g,
             pos,
@@ -491,4 +494,94 @@ def plot_k_core_graph(
     if save_path:
         plt.savefig(save_path, dpi=dpi, bbox_inches="tight")
 
+    plt.show()
+
+
+def plot_pie_chart(
+    counting,
+    save_path = None,
+    title: str = "New Graph",
+    figsize: FigSize = FigSize.AUTO,
+    dpi=FigSize.DPI.value
+):
+    #random color array of 100 elements 
+    colors_list = ["#"+''.join([random.choice('89ABCDEF') for j in range(6)]) for i in range(100)]
+    #colors_list = ["#"+''.join([random.choice('0123456789ABCDEF') for j in range(6)]) for i in range(100)]
+
+    #getting all the country codes that appear in all the communities to always set the same color for the country
+    all_country_codes = []
+    for comm in counting:
+        for country_code in counting[comm]:
+            if country_code not in all_country_codes:
+                all_country_codes.append(country_code)
+
+    #divide the image 
+    n_communities = len(counting)
+    if n_communities <= 10:
+        rows = 1
+        cols = n_communities
+    else:
+        cols = 5
+        rows = (n_communities + cols - 1) // cols
+
+    axes="ax1"
+    colors = {}
+    values = {}
+    country_codes = {}
+    for comm in counting:
+        if comm != 0:
+            axes += f",ax{comm+1}"
+
+        colors[comm] = []
+        values[comm] = []
+        country_codes[comm] = []
+        for country_code, value in zip(counting[comm], counting[comm].values()):
+            country_codes[comm].append(country_code)
+            values[comm].append(value['p'])
+            colors[comm].append(colors_list[all_country_codes.index(country_code)])
+
+    fig, axes = plt.subplots(rows, cols, figsize=figsize.value, dpi=FigSize.DPI.value)
+
+    if rows == 1 and cols == 1:
+        axes = [[axes]]
+    elif rows == 1:
+        axes = [axes]
+    elif cols == 1:
+        axes = [[ax] for ax in axes]
+    
+    #to hide extra axes
+    for i in range(rows):
+        for j in range(cols):
+            if i * cols + j >= n_communities:
+                axes[i][j].axis('off')
+    
+    for comm in counting:
+        row = comm // cols
+        col = comm % cols
+        ax = axes[row][col]
+
+        #showing labels only if the percentage is higher than 5
+        labels_to_show = [code if val > 5 else '' for code, val in zip(country_codes[comm], values[comm])]
+        #setting pct distance to 0.00 when we have only a single element
+        pct_distance = 1.2 #0.75 if len(values[comm]) > 2 else 0.00
+        label_distance = 0.75 if len(values[comm]) > 2 else 0.00
+        
+        ax.pie(
+            values[comm],
+            labels=labels_to_show,
+            colors=colors[comm],
+            autopct=lambda pct: f'{pct:.1f}%' if pct > 5 else '',
+            pctdistance=pct_distance,
+            labeldistance=label_distance,
+            textprops={'fontsize': 25}
+        )
+        ax.set_title(f'Community N.{comm+1}', fontsize=35, pad=45)
+
+    #global legend
+    handles = [plt.Rectangle((0,0),1,1, color=colors_list[i]) for i, code in enumerate(all_country_codes)]
+    fig.legend(handles, all_country_codes, loc='upper center', bbox_to_anchor=(0.5, -0.05), ncol=len(all_country_codes)//2, fontsize=25)
+    plt.tight_layout()
+
+    if save_path:
+        plt.savefig(save_path, dpi=dpi, bbox_inches="tight")
     plt.show()

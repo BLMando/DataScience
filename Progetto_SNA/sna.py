@@ -56,11 +56,11 @@ os.makedirs(SESSION_PATH, exist_ok=True)
 
 # %% [markdown]
 # ## caricamento sessione
-# %% jupyter={"source_hidden": true}
+# %%
 session_id = "2511212247"  # RICARICA UNA SESSIONE
 SESSION_PATH = f"data/sessions/{session_id}"
 
-# %% jupyter={"source_hidden": true}
+# %%
 citations_uni = pd.read_csv(f"{SESSION_PATH}/citations-uni.csv")
 citations_country = pd.read_csv(f"{SESSION_PATH}/citations-country.csv")
 papers = pd.read_csv(f"{SESSION_PATH}/papers.csv")
@@ -923,6 +923,12 @@ communities_G = sorted(nx.community.louvain_communities(G), key=len, reverse=Tru
 # %%
 louvpart_H = sorted(nx.community.louvain_partitions(H), key=len, reverse=True)
 
+# %%
+type(communities_H)
+
+# %%
+louvpart_H
+
 # %% [markdown]
 # non dimenticare di eseguire anche questo
 
@@ -936,12 +942,14 @@ graphing.set_edge_community(G)
 louvpart_H
 
 # %%
-graphing.set_node_community(H, louvpart_H)
+graphing.set_node_community(H, louvpart_H[0])
 graphing.set_edge_community(H)
 
 # %%
 print("H - senza NaN".center(50, '-'))
 comm_metrics(H, communities_H)
+
+# %%
 print("G - con NaN".center(50,'-'))
 comm_metrics(G, communities_G)
 
@@ -965,11 +973,14 @@ for comm in counting:
     print(tot)
     for v in counting[comm].values():
         v['p'] = 100 * v['v'] / tot
-    
-
 
 # %%
 counting
+
+# %%
+graphing = reload(graphing)
+title = "Community Graphs"
+graphing.plot_pie_chart(counting, title=title, figsize=graphing.FigSize.ENORMOUS1_1, save_path=f"{SESSION_PATH}/{title}")
 
 # %%
 node_color = [graphing.get_color(H.nodes[v]['community']) for v in H.nodes]
@@ -981,7 +992,7 @@ internal_color = ['black' for e in internal]
 # %%
 sizes = [H.nodes[s]['weight'] + 300 for s in H.nodes]
 
-# %% jupyter={"source_hidden": true}
+# %%
 graphing = reload(graphing)
 
 pos = nx.spring_layout(H, k=0.8, iterations=100)
@@ -997,13 +1008,13 @@ graphing.plot_community(
     figsize=graphing.FigSize.XE16_9
 )
 
-# %% jupyter={"source_hidden": true}
-graphing = reload(graphing)
-graphing.one_by_one_communities(H, communities_H)
+# %% editable=true slideshow={"slide_type": ""}
+graphing = reload(graphing)mousewheel.with_shift.actionmousewheel.with_shift.action
+graphing.one_by_one_communities(H, louvpart_H[0])
 
-# %% jupyter={"source_hidden": true}
+# %%
 graphing = reload(graphing)
-graphing.incremental_communities(H, communities_H)
+graphing.incremental_communities(H, louvpart_H[0])
 
 # %% [markdown]
 # ## K-core
@@ -1028,7 +1039,7 @@ title = f"Main Core (k = {k_core})"
 graphing.plot_k_core_graph(K, title=title, figsize=graphing.FigSize.XE16_9, save_path=f"{SESSION_PATH}/{title}")
 
 
-# %% jupyter={"source_hidden": true}
+# %%
 graphing = reload(graphing)
 
 U = nx.Graph()
