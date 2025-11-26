@@ -1,4 +1,6 @@
 import re
+import networkx as nx
+import pandas as pd
 
 
 def normalize_email(email_str):
@@ -113,3 +115,21 @@ def extract_domain(email, ror, universities):
             }
 
     return None
+
+
+def node_to_country(G: nx.Graph, ror: pd.DataFrame, uni: pd.DataFrame):
+    for n in G.nodes:
+        r = ror.loc[ror["name"] == n]
+        u = uni.loc[uni["name"] == n]
+        if not r.empty:
+            G.nodes[n]["country"] = r["country"]
+        if not u.empty:
+            G.nodes[n]["country"] = u["alpha_two_code"]
+
+
+def node_to_country_2(G: nx.Graph, uni: pd.DataFrame, country: pd.DataFrame):
+    mapping_s = dict(zip(uni["source"], country.iloc[:, 0]))
+    mapping_t = dict(zip(uni["target"], country.iloc[:, 1]))
+    mapping = {**mapping_s, **mapping_t}
+    for n in G.nodes:
+        G.nodes[n]["country"] = mapping[n]

@@ -32,6 +32,7 @@ import pandas as pd
 import utils.preproc as preproc
 import warnings
 import math
+import numpy as np
 
 
 CITATIONS_DIRECTED_GRAPH = "./data/cit-HepTG.txt"
@@ -47,7 +48,7 @@ warnings.filterwarnings("ignore")
 # Questa linea genera la session_id.
 # Se la sovrascrivi si intende che hai fatto cambiamenti al dataset perciò il resto del codice non farà più affidamento alla sessione precedente e quindi alcuni file
 # vanno rigenerati
-# %% jupyter={"source_hidden": false}
+# %% jupyter={"source_hidden": true}
 s = datetime.now().strftime("%y%m%d%H%M")
 session_id = f"{s}"  # NUOVA SESSIONE
 SESSION_PATH = f"data/sessions/{session_id}"
@@ -55,11 +56,11 @@ os.makedirs(SESSION_PATH, exist_ok=True)
 
 # %% [markdown]
 # ## caricamento sessione
-# %% jupyter={"source_hidden": false}
+# %% jupyter={"source_hidden": true}
 session_id = "2511212247"  # RICARICA UNA SESSIONE
 SESSION_PATH = f"data/sessions/{session_id}"
 
-# %%
+# %% jupyter={"source_hidden": true}
 citations_uni = pd.read_csv(f"{SESSION_PATH}/citations-uni.csv")
 citations_country = pd.read_csv(f"{SESSION_PATH}/citations-country.csv")
 papers = pd.read_csv(f"{SESSION_PATH}/papers.csv")
@@ -69,7 +70,7 @@ papers = pd.read_csv(f"{SESSION_PATH}/papers.csv")
 # eseguiamo le operazioni preliminari di caricamento dei dati
 #
 # citations contiene il grafo diretto con colonne target e source
-# %% jupyter={"source_hidden": false}
+# %%
 records = []
 
 for abp in tqdm(Path(CITATIONS_ABSTRACTS_DIR).rglob("*")):
@@ -88,6 +89,12 @@ for abp in tqdm(Path(CITATIONS_ABSTRACTS_DIR).rglob("*")):
 papers = pd.DataFrame(records)
 del records
 
+# %%
+ror
+
+# %% jupyter={"source_hidden": true}
+universities
+
 # %% [markdown]
 # Mapping dei paper alle rispettive università
 # %%
@@ -99,12 +106,18 @@ ror["tld2"] = ror["clean_url"].str.extract(r"([a-zA-Z0-9-]+\.[a-zA-Z0-9-]+)$")
 
 universities = pd.read_csv(UNIVERSITIES_DATA)
 
+# %% jupyter={"source_hidden": true}
+ror
+
+# %% jupyter={"source_hidden": true}
 domain_mapping = {
     str(row.id): preproc.extract_domain(row.email, ror, universities)
     for row in tqdm(papers.itertuples())
 }
 
-# %%
+# %% jupyter={"source_hidden": true}
+
+# %% jupyter={"source_hidden": true}
 # leggi il file come edge-list: ignora righe che iniziano con '#' e usa whitespace come separatore
 
 cit_hepth = pd.read_csv(
@@ -144,25 +157,25 @@ citations_country["source"] = citations["source"].astype(str).map(safe_get_count
 citations_country["target"] = citations["target"].astype(str).map(safe_get_country)
 
 
-# %%
+# %% jupyter={"source_hidden": true}
 citations_uni.dropna().sample(n=3)
 
-# %%
+# %% jupyter={"source_hidden": true}
 citations_country.dropna().sample(n=3)
 
 # %% [markdown]
 # ## salvataggio
-# %%
+# %% jupyter={"source_hidden": true}
 citations_uni.to_csv(f"{SESSION_PATH}/citations-uni.csv", index=False)
 citations_country.to_csv(f"{SESSION_PATH}/citations-country.csv", index=False)
 
-# %%
+# %% jupyter={"source_hidden": true}
 papers.to_csv(f"{SESSION_PATH}/papers.csv", index=False)
 
 # %% [markdown] jp-MarkdownHeadingCollapsed=true
 # # EDA
 
-# %%
+# %% jupyter={"source_hidden": true}
 unique = len(
     pd.unique(citations_country[["source", "target"]].dropna().values.ravel("K"))
 )
@@ -176,7 +189,7 @@ print(f"Abbiamo {unique} stati")
 print(f"        {edges} archi")
 print(f"        {self_loops} self loops")
 
-# %%
+# %% jupyter={"source_hidden": true}
 unique = len(pd.unique(citations_uni[["source", "target"]].dropna().values.ravel("K")))
 self_loops = len(
     citations_uni[citations_uni["source"] == citations_uni["target"]].dropna()
@@ -192,7 +205,7 @@ print(f"        {self_loops} self loops")
 # %% [markdown]
 # ## Grafi con NaN - no metriche
 
-# %%
+# %% jupyter={"source_hidden": true}
 # per testing e sviluppo delle librerie, rilanciare questo blocco ogni volta che viene
 # aggiornata una libreria
 
@@ -205,7 +218,7 @@ graphing = reload(graphing)
 # %% [markdown] jp-MarkdownHeadingCollapsed=true
 # ### Circular Layout
 
-# %%
+# %% jupyter={"source_hidden": true}
 name = "circular-wpg"
 pg = nx.DiGraph()
 graphing.add_edges(pg, citations_uni)
@@ -218,7 +231,7 @@ graphing.plot_graph(data, save_path=f"{SESSION_PATH}/{name}")
 # %% [markdown]
 # ### ARF Layout
 
-# %%
+# %% jupyter={"source_hidden": true}
 # Source - https://stackoverflow.com/a/437591
 # Posted by cdleary, modified by community. See post 'Timeline' for change history
 # Retrieved 2025-11-21, License - CC BY-SA 4.0
@@ -237,7 +250,7 @@ graphing.plot_graph(data, save_path=f"{SESSION_PATH}/{name}")
 # %% [markdown]
 # ### Kamada Kawai
 
-# %%
+# %% jupyter={"source_hidden": true}
 # Source - https://stackoverflow.com/a/437591
 # Posted by cdleary, modified by community. See post 'Timeline' for change history
 # Retrieved 2025-11-21, License - CC BY-SA 4.0
@@ -259,7 +272,7 @@ graphing.plot_graph(data, save_path=f"{SESSION_PATH}/{name}")
 # %% [markdown]
 # #### Base (Auto)
 
-# %%
+# %% jupyter={"source_hidden": true}
 # Source - https://stackoverflow.com/a/437591
 # Posted by cdleary, modified by community. See post 'Timeline' for change history
 # Retrieved 2025-11-21, License - CC BY-SA 4.0
@@ -278,7 +291,7 @@ graphing.plot_graph(data, save_path=f"{SESSION_PATH}/{name}")
 # %% [markdown]
 # #### Force
 
-# %%
+# %% jupyter={"source_hidden": true}
 # Source - https://stackoverflow.com/a/437591
 # Posted by cdleary, modified by community. See post 'Timeline' for change history
 # Retrieved 2025-11-21, License - CC BY-SA 4.0
@@ -297,7 +310,7 @@ graphing.plot_graph(data, save_path=f"{SESSION_PATH}/{name}")
 # %% [markdown]
 # #### Energy
 
-# %%
+# %% jupyter={"source_hidden": true}
 # Source - https://stackoverflow.com/a/437591
 # Posted by cdleary, modified by community. See post 'Timeline' for change history
 # Retrieved 2025-11-21, License - CC BY-SA 4.0
@@ -319,63 +332,63 @@ graphing.plot_graph(data, save_path=f"{SESSION_PATH}/{name}", show_labels=False)
 # ## Grafi e metriche con NaN 
 # Prima di continuare, bisogna calcolare le metriche
 
-# %%
+# %% jupyter={"source_hidden": true}
 gm = metrics.GraphMetrics(pg, SESSION_PATH)
 gm.calc_metrics()
 
-# %%
+# %% jupyter={"source_hidden": true}
 degree_df = pd.DataFrame(gm.degree_cent.items(), columns=['Node', 'DegreeCentrality'])
 
 print(degree_df.sort_values(by='DegreeCentrality', ascending=False).head(11))
 print(degree_df.sort_values(by='DegreeCentrality', ascending=True).head(10))
 
-# %%
+# %% jupyter={"source_hidden": true}
 closeness_df = pd.DataFrame(gm.closeness_cent.items(), columns=['Node', 'ClosenessCentrality'])
 
 print(closeness_df.sort_values(by='ClosenessCentrality', ascending=False).head(11))
 print(closeness_df.sort_values(by='ClosenessCentrality', ascending=True).head(10))
 
-# %%
+# %% jupyter={"source_hidden": true}
 betweenness_df = pd.DataFrame(gm.betweenness_cent.items(), columns=['Node', 'BetweennessCentrality'])
 
 print(betweenness_df.sort_values(by='BetweennessCentrality', ascending=False).head(11))
 print(betweenness_df.sort_values(by='BetweennessCentrality', ascending=True).head(10))
 
-# %%
+# %% jupyter={"source_hidden": true}
 eigenvector_df = pd.DataFrame(gm.eigenvector_cent.items(), columns=['Node', 'EigenvectorCentrality'])
 
 print(eigenvector_df.sort_values(by='EigenvectorCentrality', ascending=False).head(11))
 print(eigenvector_df.sort_values(by='EigenvectorCentrality', ascending=True).head(10))
 
-# %%
+# %% jupyter={"source_hidden": true}
 gm = metrics.GraphMetrics(pg, SESSION_PATH)
 gm.calc_metrics()
 
-# %%
+# %% jupyter={"source_hidden": true}
 degree_df = pd.DataFrame(gm.degree_cent.items(), columns=['Node', 'DegreeCentrality'])
 
 print(degree_df.sort_values(by='DegreeCentrality', ascending=False).head(11))
 print(degree_df.sort_values(by='DegreeCentrality', ascending=True).head(10))
 
-# %%
+# %% jupyter={"source_hidden": true}
 closeness_df = pd.DataFrame(gm.closeness_cent.items(), columns=['Node', 'ClosenessCentrality'])
 
 print(closeness_df.sort_values(by='ClosenessCentrality', ascending=False).head(11))
 print(closeness_df.sort_values(by='ClosenessCentrality', ascending=True).head(10))
 
-# %%
+# %% jupyter={"source_hidden": true}
 betweenness_df = pd.DataFrame(gm.betweenness_cent.items(), columns=['Node', 'BetweennessCentrality'])
 
 print(betweenness_df.sort_values(by='BetweennessCentrality', ascending=False).head(11))
 print(betweenness_df.sort_values(by='BetweennessCentrality', ascending=True).head(10))
 
-# %%
+# %% jupyter={"source_hidden": true}
 eigenvector_df = pd.DataFrame(gm.eigenvector_cent.items(), columns=['Node', 'EigenvectorCentrality'])
 
 print(eigenvector_df.sort_values(by='EigenvectorCentrality', ascending=False).head(11))
 print(eigenvector_df.sort_values(by='EigenvectorCentrality', ascending=True).head(10))
 
-# %%
+# %% jupyter={"source_hidden": true}
 # Source - https://stackoverflow.com/a/437591
 # Posted by cdleary, modified by community. See post 'Timeline' for change history
 # Retrieved 2025-11-21, License - CC BY-SA 4.0
@@ -398,7 +411,7 @@ data = graphing.gen_graph_data(pg, pos, gm.degree_cent)
 data["node_colors"] = [round(i*100) for i in gm.degree_cent.values()]
 graphing.plot_graph(data, label=label, title=title, figsize=graphing.FigSize.XXXL16_9, save_path=f"{SESSION_PATH}/{name}", show_labels=False)
 
-# %%
+# %% jupyter={"source_hidden": true}
 # Source - https://stackoverflow.com/a/437591
 # Posted by cdleary, modified by community. See post 'Timeline' for change history
 # Retrieved 2025-11-21, License - CC BY-SA 4.0
@@ -421,7 +434,7 @@ data = graphing.gen_graph_data(pg, pos, gm.closeness_cent)
 data["node_colors"] = [round(i*100) for i in gm.closeness_cent.values()]
 graphing.plot_graph(data, label=label, title=title,figsize=graphing.FigSize.XXXL16_9, save_path=f"{SESSION_PATH}/{name}", show_labels=False)
 
-# %%
+# %% jupyter={"source_hidden": true}
 # Source - https://stackoverflow.com/a/437591
 # Posted by cdleary, modified by community. See post 'Timeline' for change history
 # Retrieved 2025-11-21, License - CC BY-SA 4.0
@@ -445,7 +458,7 @@ data = graphing.gen_graph_data(pg, pos, gm.betweenness_cent)
 data["node_colors"] = [round(i*100) for i in gm.betweenness_cent.values()]
 graphing.plot_graph(data, label=label, title=title, figsize=graphing.FigSize.XXXL16_9, save_path=f"{SESSION_PATH}/{name}", show_labels=False)
 
-# %%
+# %% jupyter={"source_hidden": true}
 # Source - https://stackoverflow.com/a/437591
 # Posted by cdleary, modified by community. See post 'Timeline' for change history
 # Retrieved 2025-11-21, License - CC BY-SA 4.0
@@ -474,7 +487,7 @@ graphing.plot_graph(data, label=label, title=title, figsize=graphing.FigSize.XXX
 # ## Grafi e metriche senza NaN 
 # Prima di continuare, bisogna calcolare le metriche
 
-# %%
+# %% jupyter={"source_hidden": true}
 G = g.copy()
 nan_nodes = []
 limit = None
@@ -490,7 +503,7 @@ if limit:
 M = metrics.GraphMetrics(G, SESSION_PATH)
 M.calc_metrics()
 
-# %%
+# %% jupyter={"source_hidden": true}
 metrics = reload(metrics)
 graphing = reload(graphing)
 
@@ -512,7 +525,7 @@ graphing.plot_graph(data,
                     show_labels=False
                    )
 
-# %%
+# %% jupyter={"source_hidden": true}
 metrics = reload(metrics)
 graphing = reload(graphing)
 
@@ -534,7 +547,7 @@ graphing.plot_graph(data,
                     show_labels=False
                    )
 
-# %%
+# %% jupyter={"source_hidden": true}
 metrics = reload(metrics)
 graphing = reload(graphing)
 
@@ -556,7 +569,7 @@ graphing.plot_graph(data,
                     show_labels=False
                    )
 
-# %%
+# %% jupyter={"source_hidden": true}
 metrics = reload(metrics)
 graphing = reload(graphing)
 
@@ -587,10 +600,10 @@ graphing.plot_graph(data,
 # - betweenness centrality
 # - eigenvector centrality
 
-# %% [markdown] jp-MarkdownHeadingCollapsed=true
+# %% [markdown]
 # ### Definizione funzioni
 
-# %%
+# %% jupyter={"source_hidden": true}
 # per testing e sviluppo delle librerie, rilanciare questo blocco ogni volta che viene
 # aggiornata una libreria
 
@@ -601,71 +614,71 @@ graphing.plot_graph(data,
 
 metrics = reload(metrics)
 
-# %% [markdown] jp-MarkdownHeadingCollapsed=true
+# %% [markdown]
 # ### Calcolo Metriche
 
-# %%
+# %% jupyter={"source_hidden": true}
 g = nx.DiGraph()
 graphing.add_edges(g, citations_uni)
 
-# %%
+# %% jupyter={"source_hidden": true}
 gm = metrics.GraphMetrics(g, SESSION_PATH)
 gm.calc_metrics()
 
-# %%
+# %% jupyter={"source_hidden": true}
 gm.plot_distribution(gm.degree_cent.values(), "Degree Centrality Distribuition", 0.80)
 
-# %%
+# %% jupyter={"source_hidden": true}
 gm.plot_distribution(gm.closeness_cent.values(), "Closeness Centrality Distribuition", 0.80)
 
-# %%
+# %% jupyter={"source_hidden": true}
 gm.plot_distribution(gm.betweenness_cent.values(), "Betweenness Centrality Distribuition", 0.033)
 
-# %%
+# %% jupyter={"source_hidden": true}
 max(gm.betweenness_cent.values())
 
-# %%
+# %% jupyter={"source_hidden": true}
 max(gm.eigenvector_cent.values())
 
-# %%
+# %% jupyter={"source_hidden": true}
 gm.plot_distribution(gm.eigenvector_cent.values(), "Eigenvector Centrality Distribuition", 0.15)
 
-# %%
+# %% jupyter={"source_hidden": true}
 max(gm.indegree.values())
 
-# %%
+# %% jupyter={"source_hidden": true}
 gm.plot_distribution(gm.indegree.values(), "Indegree Distribuition", 0.65)
-# %%
+# %% jupyter={"source_hidden": true}
 max(gm.outdegree.values())
 
-# %%
+# %% jupyter={"source_hidden": true}
 gm.plot_distribution(gm.outdegree.values(), "Outdegree Distribuition", 0.85)
 
-# %%
+# %% jupyter={"source_hidden": true}
 max(gm.clustering_coef.values())
 
-# %%
+# %% jupyter={"source_hidden": true}
 gm.plot_distribution(gm.clustering_coef.values(), "Clustering Distribution", 1)
 
-# %%
+# %% jupyter={"source_hidden": true}
 max(gm.pagerank.values())
 
-# %%
+# %% jupyter={"source_hidden": true}
 gm.plot_distribution(gm.pagerank.values(), "Pagerank Distribution", 0.02)
 
-# %%
+# %% jupyter={"source_hidden": true}
 max(gm.k_core.values())
 
-# %%
+# %% jupyter={"source_hidden": true}
 gm.plot_distribution(gm.k_core.values(), "K-Core Distribution", 97)
 
-# %%
+# %% jupyter={"source_hidden": true}
 gm.density
 
-# %%
+# %% jupyter={"source_hidden": true}
 networkx parallel edges collpase weightgm.reciprocity
 
-# %%
+# %% jupyter={"source_hidden": true}
 gm.diameter
 
 
@@ -698,7 +711,7 @@ for i, tri in enumerate(nx.all_triads(g)):
 if tris_nodes:
     write_cache(tris_nodes, tris_edges)
 
-# %%
+# %% jupyter={"source_hidden": true}
 # intanto, rimuoviamo il nodo NaN, in questa analisi è fuorviante
 G = g.copy()
 nan_nodes = []
@@ -707,32 +720,32 @@ for node in G.nodes():
         nan_nodes.append(node)
 G.remove_nodes_from(nan_nodes)
 
-# %%
+# %% jupyter={"source_hidden": true}
 print(len(g.nodes) - len(G.nodes)) # nel grafo originale c'è solo un nodo nan
 print(len(g.edges) - len(G.edges)) # al quale vi andavano 862 archi (solo?)
 # questo tuttavia porta ad un altissimo degree
 
-# %%
+# %% jupyter={"source_hidden": true}
 nx.triadic_census(G)
 
-# %%
+# %% jupyter={"source_hidden": true}
 nx.triadic_census(g)
 
-# %%
+# %% jupyter={"source_hidden": true}
 g.in_edges(nan_nodes[0])
 
-# %%
+# %% jupyter={"source_hidden": true}
 g.out_edges(nan_nodes[0]) 
 
-# %%
+# %% jupyter={"source_hidden": true}
 # test per vedere differenza dello spring con e senza nan
 M = metrics.GraphMetrics(G, SESSION_PATH)
 M.calc_metrics()
 
-# %%
+# %% jupyter={"source_hidden": true}
 M.plot_distribution(M.degree_cent.values(), "Degree Centrality Distribuition - No NaN", 0.80)
 
-# %%
+# %% jupyter={"source_hidden": true}
 # Source - https://stackoverflow.com/a/437591
 # Posted by cdleary, modified by community. See post 'Timeline' for change history
 # Retrieved 2025-11-21, License - CC BY-SA 4.0
@@ -749,12 +762,12 @@ data = graphing.gen_graph_data(G, pos, M.degree_cent)
 data["node_colors"] = [round(i*100) for i in M.degree_cent.values()]
 graphing.plot_graph(data, label=label, title=title, figsize=graphing.FigSize.XXXL16_9, save_path=f"{SESSION_PATH}/{name}", show_labels=False)
 
-# %%
+# %% jupyter={"source_hidden": true}
 for i, tri in enumerate(nx.all_triads(g))
 
-# %%
+# %% jupyter={"source_hidden": true}
 
-# %%
+# %% jupyter={"source_hidden": true}
 
 # %% [markdown]
 # ## Clique
@@ -764,23 +777,23 @@ for i, tri in enumerate(nx.all_triads(g))
 #
 # inoltre ci serve il grafo pesato
 
-# %%
+# %% jupyter={"source_hidden": true}
 graphing = reload(graphing)
 H = nx.Graph()
 graphing.add_edges_with_weight(H, citations_uni)
 
-# %%
+# %% jupyter={"source_hidden": true}
 G.remove_nodes_from(["other"])
 
-# %%
+# %% jupyter={"source_hidden": true}
 for n in G.nodes:
     G.nodes[n]["weight"] = G.degree(n)
 
-# %%
+# %% jupyter={"source_hidden": true}
 for n in G.nodes:
     G.nodes[n]["weight"] = 1
 
-# %%
+# %% jupyter={"source_hidden": true}
 maximal = 0
 allc = 0
 
@@ -802,21 +815,21 @@ print(f"       numero di nodi nella massimale {len(maxc)}")
 # %% [markdown]
 # Possiamo già notare che la clique massimale ha un peso totale interessante per essere composta da "soli" 45 nodi. Il sospetto è che nella clique sia presente (ovviamente) il nodo "other".
 
-# %%
+# %% jupyter={"source_hidden": true}
 for i in maxc:
     print(i)
 
 # %% [markdown]
 # provando a rimuovere dal grafo il nodo "other" notiamo se ci sono differenze
 
-# %%
+# %% jupyter={"source_hidden": true}
 graphing = reload(graphing)
 H = nx.Graph()
 graphing.add_edges_with_weight(H, citations_uni, with_nan=False)
 for n in G.nodes:
     G.nodes[n]["weight"] = G.degree(n)
 
-# %%
+# %% jupyter={"source_hidden": true}
 maximal = 0
 allc = 0
 
@@ -833,7 +846,7 @@ print(f"clique massimali trovate {maximal}")
 print(f"clique massima: {maxn} (peso, dove il peso è il degree dei nodi)")
 print(f"       numero di nodi nella massimale {len(maxc)}")
 
-# %%
+# %% jupyter={"source_hidden": true}
 for i in maxc:
     print(i)
 
@@ -842,11 +855,11 @@ for i in maxc:
 # Tuttavia il numero di clique massimali ci fa intuire che quello è il minimo numero di clique che possiamo trovare.
 # Cercare il massimo, ovviamente, non è pensabile in quanto le risorse computazionali per farlo sono eccessive, ed onestamente inutili (non ci porta informazione).
 
-# %%
+# %% jupyter={"source_hidden": true}
 nx.node_clique_number(H)
 
 
-# %%
+# %% jupyter={"source_hidden": true}
 
 # %% [markdown]
 # bisogna fare anche K-core
@@ -880,9 +893,15 @@ def comm_metrics(S, comm):
 H = nx.DiGraph()
 G = nx.DiGraph()
 graphing.add_edges_with_weight(H, citations_uni, with_nan=False) # ci sono nodi che si collegano solo a NaN
-graphing.add_edges_with_weight(G, citations_uni, with_nan=True)
+# per questo, e per altre ragioni di pulizia del grafo, abbiamo deciso di toglierli
+graphing.add_edges_with_weight(G, citations_uni, with_nan=True) # ne teniamo uno di grafo non pulito per fare il confronto
 weight_nodes(H)
 weight_nodes(G)
+
+# %%
+preproc = reload(preproc)
+#preproc.node_to_country(H, ror, universities)
+preproc.node_to_country_2(H, citations_uni, citations_country)
 
 # %% [markdown]
 # Scegliere un algoritmo e poi procedere
@@ -901,6 +920,9 @@ len(communities)
 communities_H = sorted(nx.community.louvain_communities(H), key=len, reverse=True)
 communities_G = sorted(nx.community.louvain_communities(G), key=len, reverse=True)
 
+# %%
+louvpart_H = sorted(nx.community.louvain_partitions(H), key=len, reverse=True)
+
 # %% [markdown]
 # non dimenticare di eseguire anche questo
 
@@ -911,13 +933,43 @@ graphing.set_node_community(G, communities_G)
 graphing.set_edge_community(G)
 
 # %%
-communities_H
+louvpart_H
+
+# %%
+graphing.set_node_community(H, louvpart_H)
+graphing.set_edge_community(H)
 
 # %%
 print("H - senza NaN".center(50, '-'))
 comm_metrics(H, communities_H)
 print("G - con NaN".center(50,'-'))
 comm_metrics(G, communities_G)
+
+# %%
+counting = {}
+for i,c in enumerate(communities_H):
+    print(f"{i+1}".center(80))
+    counting[i] = {}
+    for r in c:
+        country = H.nodes[r]['country']
+        if country not in counting[i]:
+            counting[i][country] = {'v': 1}
+        else:
+            counting[i][country]['v'] += 1
+        print(f"{r} - {country}")
+    print(counting[i])
+
+# %%
+for comm in counting:
+    tot = sum(v['v'] for v in counting[comm].values())
+    print(tot)
+    for v in counting[comm].values():
+        v['p'] = 100 * v['v'] / tot
+    
+
+
+# %%
+counting
 
 # %%
 node_color = [graphing.get_color(H.nodes[v]['community']) for v in H.nodes]
@@ -929,7 +981,7 @@ internal_color = ['black' for e in internal]
 # %%
 sizes = [H.nodes[s]['weight'] + 300 for s in H.nodes]
 
-# %%
+# %% jupyter={"source_hidden": true}
 graphing = reload(graphing)
 
 pos = nx.spring_layout(H, k=0.8, iterations=100)
@@ -945,15 +997,18 @@ graphing.plot_community(
     figsize=graphing.FigSize.XE16_9
 )
 
-# %%
+# %% jupyter={"source_hidden": true}
 graphing = reload(graphing)
 graphing.one_by_one_communities(H, communities_H)
 
-# %%
+# %% jupyter={"source_hidden": true}
 graphing = reload(graphing)
 graphing.incremental_communities(H, communities_H)
 
-# %%
+# %% [markdown]
+# ## K-core
+
+# %% jupyter={"source_hidden": true}
 graphing = reload(graphing)
 
 U = nx.Graph()
@@ -973,4 +1028,116 @@ title = f"Main Core (k = {k_core})"
 graphing.plot_k_core_graph(K, title=title, figsize=graphing.FigSize.XE16_9, save_path=f"{SESSION_PATH}/{title}")
 
 
-# %%
+# %% jupyter={"source_hidden": true}
+graphing = reload(graphing)
+
+U = nx.Graph()
+graphing.add_edges_with_weight(U, citations_uni, with_nan=False)
+
+U.remove_edges_from(nx.selfloop_edges(U))
+
+#for i in range (1,80):
+#    print(f"{i} {len(nx.k_core(U, i).nodes)}")
+
+# Create k-core subgraph
+k_core = 62
+K = nx.k_core(U, k_core)
+
+title = f"Main Core (k = {k_core})"
+
+graphing.plot_k_core_graph(K, title=title, figsize=graphing.FigSize.XE16_9, save_path=f"{SESSION_PATH}/{title}")
+
+
+# %% jupyter={"source_hidden": true}
+graphing = reload(graphing)
+
+U = nx.Graph()
+graphing.add_edges_with_weight(U, citations_uni, with_nan=False)
+weight_nodes(U)
+U.remove_edges_from(nx.selfloop_edges(U))
+
+
+# %% jupyter={"source_hidden": true}
+mean_degree = sum(a[1] for a in U.degree)/len(U.degree)
+
+# %% jupyter={"source_hidden": true}
+mean_degree = np.median([d for _, d in U.degree])
+
+# %% jupyter={"source_hidden": true}
+mean_degree
+
+# %% jupyter={"source_hidden": true}
+sorted_nodes = list(sorted(U.degree, key=lambda x: x[1], reverse=True))
+
+# %% jupyter={"source_hidden": true}
+error = 50
+_err = mean_degree*error/100
+mean_upper = mean_degree + _err
+mean_lower = mean_degree - _err
+print(f"up {mean_upper} - down {mean_lower}")
+nodes_outlie_up = [a for a in sorted_nodes if a[1] > mean_upper]
+nodes_outlie_down= [a for a in sorted_nodes if a[1] < mean_lower]
+nodes_inside = [a for a in sorted_nodes if a[1] < mean_upper and a[1] > mean_lower]
+print(f"_")
+print(len( nodes_outlie_up))
+print(f"|")
+print(f"{len(nodes_inside)}")
+print(f"|")
+print(len( nodes_outlie_down))
+print(f"_")
+
+# %% jupyter={"source_hidden": true}
+U.remove_nodes_from([a[0] for a in nodes_outlie_up])
+U.remove_nodes_from([a[0] for a in nodes_outlie_down])
+
+# %% jupyter={"source_hidden": true}
+
+# %% jupyter={"source_hidden": true}
+max_one = sorted_nodes.pop()
+U.remove_node(max_one[0])
+print(f"{max_one} removed")
+
+# %% jupyter={"source_hidden": true}
+#for i in range (1,80):
+#    print(f"{i} {len(nx.k_core(U, i).nodes)}")
+
+# Create k-core subgraph
+k_core = 90
+K = nx.k_core(U, k_core)
+
+title = f"Main Core (k = {k_core})"
+
+graphing.plot_k_core_graph(K, title=title, figsize=graphing.FigSize.XE16_9, save_path=f"{SESSION_PATH}/{title}")
+
+
+# %% jupyter={"source_hidden": true}
+communities_U = sorted(nx.community.louvain_communities(U), key=len, reverse=True)
+graphing.set_node_community(U, communities_U)
+graphing.set_edge_community(U)
+
+print("U".center(50, '-'))
+comm_metrics(U, communities_U)
+node_color = [graphing.get_color(U.nodes[v]['community']) for v in U.nodes]
+# Set community color for edges between members of the same community (internal) and intra-community edges (external)
+external = [(v, w) for v, w in U.edges if U.edges[v, w]['community'] == 0]
+internal = [(v, w) for v, w in U.edges if U.edges[v, w]['community'] > 0]
+internal_color = ['black' for e in internal]
+sizes = [U.nodes[s]['weight'] + 300 for s in U.nodes]
+
+# %% jupyter={"source_hidden": true}
+graphing = reload(graphing)
+
+pos = nx.spring_layout(U, k=0.8, iterations=100)
+graphing.plot_community(
+    U,
+    pos,
+    community_colors=node_color,
+    external=external,
+    internal=internal,
+    internal_color=internal_color,
+    name="cazzo",
+    node_size=sizes,
+    figsize=graphing.FigSize.XE16_9
+)
+
+# %% jupyter={"source_hidden": true}
