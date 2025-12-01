@@ -49,43 +49,54 @@ nlu:
     - no way
     - not really
 
-- intent: mood_great
-  examples: |
-    - perfect
-    - great
-    - amazing
-    - feeling like a king
-    - wonderful
-    - I am feeling very good
-    - I am great
-    - I am amazing
-    - I am going to save the world
-    - super stoked
-    - extremely good
-    - so so perfect
-    - so good
-    - so perfect
-
-- intent: mood_unhappy
-  examples: |
-    - my day was horrible
-    - I am sad
-    - I don't feel very well
-    - I am disappointed
-    - super sad
-    - I'm so sad
-    - sad
-    - very sad
-    - unhappy
-    - not good
-    - not very good
-    - extremly sad
-    - so saad
-    - so sad
-
 - intent: bot_challenge
   examples: |
     - are you a bot?
     - are you a human?
     - am I talking to a bot?
     - am I talking to a human?
+
+- intent: bot_abilities
+  examples: |
+    - what can you do?
+    - what are your capabilities?
+    - what can you help me with?
+    - what can you do for me?
+    - what are your skills?
+    - can you recommend games?
+    - how does this work?
+    - help me
+    - show me what you can do
+    - list your features
+    - tell me what you are capable of
+    - can you find games for me?
+    - what is your purpose?
+
+- intent: out_of_scope
+  examples: |
+    - How do i fix my car?
+    - How tall is Mount Everest?
+    - what is the weather like?
+    - order a pizza
+    - who is the president of usa?
+    - translate this to spanish
+    - book a flight to london
+    - tell me a joke
+    - how do i cook pasta?
+    - what is the capital of france?
+    - i want to buy a car
+    - can you clean my room?
+
+
+- intent: search_game
+  examples: |
+    - I am looking for an [RPG](genre) game
+    - Recommend me a shooter
+    - I want to play an [adventure](genre) game
+    - Search games for [PS5](platform)
+    - Find me an [action](genre) game for [Xbox](platform)
+    - I need a [racing](genre) game
+    - What are the best [indie](genre) games?
+    - Show me [strategy](genre) games
+
+

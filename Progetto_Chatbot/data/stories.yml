@@ -2,29 +2,49 @@ version: "3.1"
 
 stories:
 
-- story: happy path
+- story: Search and Goodbye
   steps:
   - intent: greet
   - action: utter_greet
-  - intent: mood_great
-  - action: utter_happy
-
-- story: sad path 1
-  steps:
-  - intent: greet
-  - action: utter_greet
-  - intent: mood_unhappy
-  - action: utter_cheer_up
-  - action: utter_did_that_help
-  - intent: affirm
-  - action: utter_happy
-
-- story: sad path 2
-  steps:
-  - intent: greet
-  - action: utter_greet
-  - intent: mood_unhappy
-  - action: utter_cheer_up
-  - action: utter_did_that_help
-  - intent: deny
+  - intent: search_game
+  - action: action_search_game
+  - intent: goodbye
   - action: utter_goodbye
+
+- story: Simple Search (Genre)
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: search_game
+    entities:
+    - genre: "rpg"
+  - slot_was_set:
+    - genre: "rpg"
+  - action: action_search_game
+
+- story: Simple Search (Platform)
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: search_game
+    entities:
+    - platform: "ps5"
+  - slot_was_set:
+    - platform: "ps5"
+  - action: action_search_game
+
+- story: Complex Search (Genre + Platform)
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: search_game
+    entities:
+    - genre: "action"
+    - platform: "pc"
+  - slot_was_set:
+    - genre: "action"
+    - platform: "pc"
+  - action: action_search_game
+
+
+
