@@ -3,6 +3,8 @@ version: "3.1"
 rules:
 
 - rule: Say goodbye anytime the user says goodbye
+  condition:
+  - active_loop: null
   steps:
   - intent: goodbye
   - action: utter_goodbye
@@ -26,6 +28,12 @@ rules:
   steps:
   - intent: nlu_fallback
   - action: utter_fallback
+
+- rule: Handle core fallback
+  steps:
+  - action: action_my_fallback
+  - action: action_listen
+
 - rule: Activate game search form
   steps:
   - intent: search_game
@@ -41,22 +49,22 @@ rules:
   - slot_was_set:
     - requested_slot: null
   - action: utter_submit_game_search_form
-  - action: action_search_game
+  - action: action_recommend_games
 
-- rule: Direct game search by name
+- rule: Direct game search by name (interrupts form)
   condition:
   - active_loop: game_search_form
   steps:
   - intent: search_game_by_name
   - active_loop: null
-  - action: action_search_game
+  - action: action_search_game_by_name
 
-- rule: Direct game search by name (no loop)
+- rule: Search game by name
   condition:
   - active_loop: null
   steps:
   - intent: search_game_by_name
-  - action: action_search_game
+  - action: action_search_game_by_name
 
 - rule: Show game details
   steps:
@@ -64,26 +72,66 @@ rules:
   - action: action_game_details
 
 - rule: Handle deny after search
+  condition:
+  - active_loop: null
   steps:
   - intent: deny
   - action: utter_deny_details
 
+# =========================================================================
+# FORM INTERRUPTIONS (handle and resume)
+# =========================================================================
 
-- rule: Interruption - Bot Challenge
+- rule: Form Interruption - Bot Challenge
   condition:
   - active_loop: game_search_form
   steps:
   - intent: bot_challenge
   - action: utter_iamabot
   - action: game_search_form
+  - active_loop: game_search_form
 
-- rule: Interruption - Search by Name
+- rule: Form Interruption - Greet
+  condition:
+  - active_loop: game_search_form
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - action: game_search_form
+  - active_loop: game_search_form
+
+- rule: Form Interruption - Bot Abilities
+  condition:
+  - active_loop: game_search_form
+  steps:
+  - intent: bot_abilities
+  - action: utter_bot_abilities
+  - action: game_search_form
+  - active_loop: game_search_form
+
+- rule: Form Interruption - Goodbye (exit form)
+  condition:
+  - active_loop: game_search_form
+  steps:
+  - intent: goodbye
+  - action: utter_goodbye
+  - active_loop: null
+  - action: action_deactivate_loop
+
+- rule: Form Interruption - Search by Name (exit form)
   condition:
   - active_loop: game_search_form
   steps:
   - intent: search_game_by_name
-  - active_loop: null
-  - action: action_search_game
+  - action: action_search_game_by_name
+  - action: game_search_form
+
+- rule: Form Unhappy Path - Invalid Input
+  condition:
+  - active_loop: game_search_form
+  steps:
+  - action: game_search_form
+  - active_loop: game_search_form
 
 - rule: Handle Skip outside form
   condition:
@@ -91,3 +139,4 @@ rules:
   steps:
   - intent: skip
   - action: utter_fallback
+

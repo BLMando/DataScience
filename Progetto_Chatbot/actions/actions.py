@@ -1,80 +1,17 @@
 from typing import Any, Text, Dict, List
 from rasa_sdk import Action, Tracker, FormValidationAction
 from rasa_sdk.executor import CollectingDispatcher
-from rasa_sdk.events import SlotSet
+from rasa_sdk.events import SlotSet, FollowupAction
 from rasa_sdk.types import DomainDict
 from difflib import SequenceMatcher
 import requests
 from dotenv import load_dotenv
 import os
+from .utils import get_platform_id, get_genre_id, get_developer_slug, format_game_snapshot
 
 load_dotenv()
 API_KEY = os.getenv("RAWG_API_KEY")
 BASE_URL = "https://api.rawg.io/api"
-
-# Similarity function for comparing game names
-def similarity(a, b):
-    return SequenceMatcher(None, a.lower(), b.lower()).ratio()
-
-def get_platform_id(platform_name: str) -> int:
-    """Maps user-provided platform names to RAWG API Platform IDs."""
-    if not platform_name:
-        return None
-    
-    platform_name = platform_name.lower()
-    
-    mapping = {
-        "pc": 4,
-        "playstation 5": 187, "ps5": 187,
-        "playstation 4": 18, "ps4": 18,
-        "xbox one": 1,
-        "xbox series s/x": 186, "xbox series x": 186, "xbox series s": 186,
-        "nintendo switch": 7, "switch": 7,
-        "ios": 3, "android": 21,
-        "nintendo 3ds": 8, "3ds": 8,
-        "nintendo ds": 9, "ds": 9,
-        "macos": 5, "mac": 5, "linux": 6,
-        "xbox 360": 14, "xbox": 80,
-        "playstation 3": 16, "ps3": 16,
-        "playstation 2": 15, "ps2": 15,
-        "playstation": 27, "ps1": 27, "psx": 27,
-        "ps vita": 19, "vita": 19, "psp": 17,
-        "wii u": 10, "wii": 11,
-        "gamecube": 105, "nintendo 64": 83, "n64": 83,
-        "game boy advance": 24, "gba": 24,
-        "game boy color": 43, "gbc": 43,
-        "game boy": 26, "gb": 26,
-        "snes": 79, "nes": 49,
-        "dreamcast": 106, "genesis": 167, "sega genesis": 167,
-        "neo geo": 12
-    }
-    
-    return mapping.get(platform_name)
-
-def get_genre_id(genre_name: str) -> int:
-    """Maps user-provided genre names to RAWG API Genre IDs."""
-    if not genre_name:
-        return None
-    
-    genre_name = genre_name.lower()
-    
-    mapping = {
-        "action": 4, "indie": 51, "adventure": 3,
-        "rpg": 5, "strategy": 10, "shooter": 2,
-        "casual": 40, "simulation": 14, "puzzle": 7,
-        "arcade": 11, "platformer": 83, "massively multiplayer": 59,
-        "racing": 1, "sports": 15, "fighting": 6,
-        "family": 19, "board games": 28, "board": 28,
-        "card": 17, "educational": 34
-    }
-    
-    return mapping.get(genre_name)
-
-def get_developer_slug(developer_name: str) -> str:
-    """Converts developer name to slug format for RAWG API."""
-    if not developer_name:
-        return None
-    return developer_name.lower().replace(" ", "-")
 
 
 class ActionMyFallback(Action):
@@ -85,120 +22,113 @@ class ActionMyFallback(Action):
         dispatcher.utter_message(response="utter_fallback")
         return [SlotSet("game_title", None), SlotSet("genre", None), SlotSet("platform", None)]
 
-
 class ValidateGameSearchForm(FormValidationAction):
     def name(self) -> Text:
         return "validate_game_search_form"
 
     def validate_platform(self, slot_value: Any, dispatcher: CollectingDispatcher, tracker: Tracker, domain: DomainDict) -> Dict[Text, Any]:
-        if slot_value.lower() == "skipped":
+        if not slot_value:
+            return {"platform": None}
+        
+        value = slot_value.lower().strip()
+        
+        # Accept skip variants
+        if value in ["skip", "skipped", "no platform", "any", "none"]:
             return {"platform": "skipped"}
         
-        platform_id = get_platform_id(slot_value)
+        # Check if it's a valid platform
+        platform_id = get_platform_id(value)
         if platform_id:
-            return {"platform": slot_value}
-        else:
-            return {"platform": slot_value.lower()}
+            return {"platform": value}
+        
+        # Invalid input - ask again
+        dispatcher.utter_message(text=f"🤔 I don't recognize '{slot_value}' as a platform. Try PC, PS5, Xbox, Switch, etc. or 'skip'.")
+        return {"platform": None}
 
     def validate_genre(self, slot_value: Any, dispatcher: CollectingDispatcher, tracker: Tracker, domain: DomainDict) -> Dict[Text, Any]:
-        if slot_value.lower() == "skipped":
+        if not slot_value:
+            return {"genre": None}
+        
+        value = slot_value.lower().strip()
+        
+        # Accept skip variants
+        if value in ["skip", "skipped", "no genre", "any", "none"]:
             return {"genre": "skipped"}
         
-        genre_id = get_genre_id(slot_value)
+        # Check if it's a valid genre
+        genre_id = get_genre_id(value)
         if genre_id:
-            return {"genre": slot_value}
-        else:
-            slug = slot_value.lower().replace(" ", "-")
-            return {"genre": slug}
+            return {"genre": value}
+        
+        # Invalid input - ask again
+        dispatcher.utter_message(text=f"🤔 I don't recognize '{slot_value}' as a genre. Try Action, RPG, Shooter, Adventure, etc. or 'skip'.")
+        return {"genre": None}
 
     def validate_developer(self, slot_value: Any, dispatcher: CollectingDispatcher, tracker: Tracker, domain: DomainDict) -> Dict[Text, Any]:
-        if slot_value.lower() == "skipped":
+        if not slot_value:
+            return {"developer": None}
+        
+        value = slot_value.lower().strip()
+        
+        # Accept skip variants
+        if value in ["skip", "skipped", "no developer", "any", "none"]:
             return {"developer": "skipped"}
         
-        slug = slot_value.lower().replace(" ", "-")
+        # Accept any developer name (we can't validate all possible developers)
+        slug = value.replace(" ", "-")
         return {"developer": slug}
 
-
-class ActionSearchGame(Action):
+class ActionSearchGameByName(Action):
+    """Search for a specific game by title."""
+    
     def name(self) -> Text:
-        return "action_search_game"
+        return "action_search_game_by_name"
 
     def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
-        """Search for games based on game title, genre, platform, or developer."""
-        latest_message = tracker.latest_message
-        intent = latest_message.get("intent", {}).get("name")
-        entities = latest_message.get("entities", [])
-        
+        entities = tracker.latest_message.get("entities", [])
         game_title_entity = next((e for e in entities if e["entity"] == "game_title"), None)
         game_title = tracker.get_slot("game_title")
 
-        if intent == "search_game_by_name":
-            if game_title_entity:
-                game_title = game_title_entity["value"]
-            elif not game_title:
-                dispatcher.utter_message(response="utter_ask_game_name")
-                return [SlotSet("game_title", None)]
-        elif intent == "search_game":
-            game_title = None
-                
-        if game_title:
-            return self._handle_specific_search(dispatcher, game_title)
-        else:
-            return self._handle_recommendation_search(dispatcher, tracker)
-
-    def _handle_specific_search(self, dispatcher: CollectingDispatcher, game_title: Text) -> List[Dict[Text, Any]]:
-        """Dual-search strategy: compare flexible vs strict search and pick best match."""
-        headers = {"User-Agent": "GameGuruChatbot/1.0"}
-        base_params = {
+        # Prioritize fresh entity over stale slot
+        if game_title_entity:
+            game_title = game_title_entity["value"]
+        
+        if not game_title:
+            dispatcher.utter_message(response="utter_ask_game_name")
+            return [SlotSet("game_title", None)]
+        
+        # Search for the game
+        params = {
             "key": API_KEY,
             "search": game_title,
-            "page_size": 1,
-            "search_precise": True,
-            "ordering": "-rating"
+            "page_size": 1
         }
 
         try:
-            # Search 1: Flexible (search_exact=False)
-            params = {**base_params, "search_exact": False}
-            print(f"🔍 Flexible search for '{game_title}'")
-            response = requests.get(f"{BASE_URL}/games", params=params, headers=headers)
+            response = requests.get(f"{BASE_URL}/games", params=params)
             response.raise_for_status()
-            result_flexible = response.json().get("results", [])
-
-            # Search 2: Strict (search_exact=True)
-            params = {**base_params, "search_exact": True}
-            print(f"🔍 Strict search for '{game_title}'")
-            response = requests.get(f"{BASE_URL}/games", params=params, headers=headers)
-            response.raise_for_status()
-            result_strict = response.json().get("results", [])
-
-            # Pick best match based on similarity score
-            candidates = []
-            if result_flexible:
-                score = similarity(result_flexible[0]["name"], game_title)
-                candidates.append((result_flexible[0], score, "flexible"))
-            if result_strict:
-                score = similarity(result_strict[0]["name"], game_title)
-                candidates.append((result_strict[0], score, "strict"))
-
-            if not candidates:
+            result = response.json().get("results", [])
+            
+            if not result:
                 dispatcher.utter_message(response="utter_game_not_found")
-                return [SlotSet("game_title", None), SlotSet("genre", None), SlotSet("platform", None), SlotSet("developer", None)]
-
-            # Select best match by highest similarity score
-            best_match, best_score, source = max(candidates, key=lambda x: x[1])
-            print(f"🎯 Best match: '{best_match['name']}' (Score: {best_score:.2f}, Source: {source})")
-                 
-            self._format_game_snapshot(dispatcher, best_match)
+                return [SlotSet("game_title", None)]
+            
+            format_game_snapshot(dispatcher, result[0])
             dispatcher.utter_message(response="utter_ask_game_details")
-            return [SlotSet("game_id", str(best_match.get("id"))), SlotSet("game_title", best_match.get("name"))]
+            return [SlotSet("game_id", str(result[0].get("id"))), SlotSet("game_title", None)]
     
         except Exception as e:
             print(f"❌ Error: {e}")
             dispatcher.utter_message(text="💥 Critical Hit! Something went wrong with the server. Please try again.")
-            return [SlotSet("genre", None), SlotSet("platform", None), SlotSet("developer", None), SlotSet("game_title", None)]
+            return [SlotSet("game_title", None), SlotSet("game_id", None)]
 
-    def _handle_recommendation_search(self, dispatcher: CollectingDispatcher, tracker: Tracker) -> List[Dict[Text, Any]]:
+class ActionRecommendGames(Action):
+    """Recommend games based on genre, platform, and developer filters."""
+    
+    def name(self) -> Text:
+        return "action_recommend_games"
+
+    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
         genre = tracker.get_slot("genre")
         platform = tracker.get_slot("platform")
         developer = tracker.get_slot("developer")
@@ -209,6 +139,7 @@ class ActionSearchGame(Action):
             "ordering": "-rating"
         }
         
+        # Check if all filters are skipped
         if (not genre or genre == "skipped") and \
            (not platform or platform == "skipped") and \
            (not developer or developer == "skipped"):
@@ -218,28 +149,33 @@ class ActionSearchGame(Action):
             if genre and genre != "skipped":
                 genre_id = get_genre_id(genre)
                 params["genres"] = genre_id if genre_id else genre
+                print(f"Genre: {genre}")
 
             if platform and platform != "skipped":
                 platform_id = get_platform_id(platform)
                 if platform_id:
-                    params["platforms"] = platform_id
+                    params["platforms"] = platform_id if platform_id else platform
+                print(f"Platform: {platform}")
             
             if developer and developer != "skipped":
                 dev_slug = get_developer_slug(developer)
                 params["developers"] = dev_slug
-
-        headers = {"User-Agent": "GameGuruChatbot/1.0"}
-        print(f"Requesting games with params: {params}")
+                print(f"Developer: {developer}")
 
         try:
-            response = requests.get(f"{BASE_URL}/games", params=params, headers=headers)
+            response = requests.get(f"{BASE_URL}/games", params=params)
             response.raise_for_status()
             data = response.json()
             results = data.get("results", [])
             
             if not results:
                 dispatcher.utter_message(response="utter_game_not_found")
-                return [SlotSet("game_title", None), SlotSet("genre", None), SlotSet("platform", None), SlotSet("developer", None)]
+                return [
+                    SlotSet("genre", None),
+                    SlotSet("platform", None),
+                    SlotSet("developer", None),
+                    FollowupAction("game_search_form")
+                ]
 
             # Construct dynamic header
             header_parts = ["📦 Loot drop! Here are some"]
@@ -281,36 +217,11 @@ class ActionSearchGame(Action):
                     dispatcher.utter_message(text=game_msg)
 
         except Exception as e:
-            print(f"Error: {e}")
+            print(f"❌ Error: {e}")
             dispatcher.utter_message(text="💥 Critical Hit! Something went wrong with the server. Please try again.")
-            return [SlotSet("genre", None), SlotSet("platform", None), SlotSet("developer", None), SlotSet("game_title", None)]
+            return [SlotSet("genre", None), SlotSet("platform", None), SlotSet("developer", None)]
 
         return [SlotSet("genre", None), SlotSet("platform", None), SlotSet("developer", None)]
-
-    def _format_game_snapshot(self, dispatcher: CollectingDispatcher, game: Dict[Text, Any]):
-        title = game.get("name")
-        rating = game.get("rating", "N/A")
-        released = game.get("released", "N/A")
-        background_image = game.get("background_image")
-        metacritic = game.get("metacritic")
-        playtime = game.get("playtime")
-        
-        message = f"🎯 Target acquired! I found {title}!\n"
-        message += f"📅 Released: {released}\n"
-        
-        stats = []
-        stats.append(f"⭐ Rating: {rating}/5")
-        if metacritic:
-            stats.append(f"🟢 Metacritic: {metacritic}")
-        if playtime:
-            stats.append(f"⏳ Playtime: {playtime}h")
-        
-        message += " | ".join(stats)
-
-        dispatcher.utter_message(text=message)
-        if background_image:
-            dispatcher.utter_message(image=background_image)
-
 
 class ActionGameDetails(Action):
     def name(self) -> Text:
@@ -319,7 +230,6 @@ class ActionGameDetails(Action):
     def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
         game_id = tracker.get_slot("game_id")
         game_title = tracker.get_slot("game_title")
-        headers = {"User-Agent": "GameGuruChatbot/1.0"}
 
         latest_message = tracker.latest_message
         entities = latest_message.get("entities", [])
@@ -337,16 +247,15 @@ class ActionGameDetails(Action):
         if not game_id:
             if game_title:
                 dispatcher.utter_message(text=f"🔍 Consulting the archives for {game_title}...")
+                
                 search_params = {
                     "key": API_KEY,
                     "search": game_title,
-                    "page_size": 1,
-                    "search_precise": True,
-                    "search_exact": True
+                    "page_size": 1
                 }
          
                 try:
-                    search_response = requests.get(f"{BASE_URL}/games", params=search_params, headers=headers)
+                    search_response = requests.get(f"{BASE_URL}/games", params=search_params)
                     search_response.raise_for_status()
                     search_data = search_response.json()
                     results = search_data.get("results", [])
@@ -368,7 +277,7 @@ class ActionGameDetails(Action):
         params = {"key": API_KEY}
         
         try:
-            response = requests.get(f"{BASE_URL}/games/{game_id}", params=params, headers=headers)
+            response = requests.get(f"{BASE_URL}/games/{game_id}", params=params)
             response.raise_for_status()
             game = response.json()
             
@@ -413,24 +322,8 @@ class ActionGameDetails(Action):
             dispatcher.utter_message(text=message)
             if background_image:
                 dispatcher.utter_message(image=background_image)
-
-            # PC Requirements
-            for platform_info in game.get("platforms", []):
-                if platform_info.get("platform", {}).get("id") == 4:
-                    requirements = platform_info.get("requirements", {})
-                    if requirements:
-                        min_req = requirements.get("minimum", "")
-                        rec_req = requirements.get("recommended", "")
-                        if min_req or rec_req:
-                            req_msg = "🖥️ PC Requirements:\n"
-                            if min_req:
-                                req_msg += f"Minimum:\n{min_req}\n"
-                            if rec_req:
-                                req_msg += f"Recommended:\n{rec_req}\n"
-                            dispatcher.utter_message(text=req_msg)
-                    break
             
-            return [SlotSet("game_id", str(game_id)), SlotSet("game_title", title)]
+            return [SlotSet("game_id", None), SlotSet("game_title", None)]
 
         except requests.exceptions.HTTPError as e:
             if e.response.status_code == 404:

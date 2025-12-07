@@ -3,8 +3,7 @@ version: "3.1"
 stories:
 
 
-
-- story: Game Search Form Happy Path
+- story: Game Recommendation - Happy Path
   steps:
   - intent: greet
   - action: utter_greet
@@ -15,9 +14,9 @@ stories:
   - slot_was_set:
     - requested_slot: null
   - action: utter_submit_game_search_form
-  - action: action_search_game
+  - action: action_recommend_games
 
-- story: Game Search Form with Skip
+- story: Game Recommendation with Skip
   steps:
   - intent: greet
   - action: utter_greet
@@ -30,30 +29,30 @@ stories:
   - slot_was_set:
     - requested_slot: null
   - action: utter_submit_game_search_form
-  - action: action_search_game
+  - action: action_recommend_games
 
 
-
-- story: Game Search by Title
+- story: Search Game by Title
   steps:
   - intent: search_game_by_name
   - slot_was_set:
     - game_title: "The Witcher 3"
-  - action: action_search_game
+  - action: action_search_game_by_name
   - slot_was_set:
     - game_id: "123"
 
-- story: Game Search by Title and Details
+- story: Search Game by Title then Details
   steps:
   - intent: search_game_by_name
   - slot_was_set:
     - game_title: "The Witcher 3"
-  - action: action_search_game
+  - action: action_search_game_by_name
   - intent: game_details
   - action: action_game_details
 
-- story: Game Details Context
+- story: View Game Details after Search
   steps:
-  - action: action_search_game
+  - action: action_search_game_by_name
   - intent: game_details
   - action: action_game_details
+

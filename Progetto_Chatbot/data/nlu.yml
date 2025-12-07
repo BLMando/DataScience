@@ -29,14 +29,12 @@ nlu:
     - good day
     - what's up
     - howdy
-    - ciao
-    - salve
 
 - intent: goodbye
   examples: |
     - cu
     - good by
-    - cee you later
+    - see you later
     - good night
     - bye
     - goodbye
@@ -52,8 +50,6 @@ nlu:
     - exit
     - later
     - peace out
-    - ciao
-    - arrivederci
 
 - intent: affirm
   examples: |
