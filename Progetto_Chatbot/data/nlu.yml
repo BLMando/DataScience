@@ -1,6 +1,10 @@
 version: "3.1"
 
 nlu:
+# ============================================================================
+# BASE INTENTS
+# ============================================================================
+
 - intent: greet
   examples: |
     - hey
@@ -16,6 +20,17 @@ nlu:
     - goodmorning
     - goodevening
     - good afternoon
+    - yo
+    - hi there
+    - greetings
+    - hello bot
+    - start
+    - wake up
+    - good day
+    - what's up
+    - howdy
+    - ciao
+    - salve
 
 - intent: goodbye
   examples: |
@@ -29,6 +44,16 @@ nlu:
     - see you around
     - bye bye
     - see you later
+    - catch you later
+    - I'm out
+    - quit
+    - end session
+    - stop
+    - exit
+    - later
+    - peace out
+    - ciao
+    - arrivederci
 
 - intent: affirm
   examples: |
@@ -38,6 +63,10 @@ nlu:
     - of course
     - that sounds good
     - correct
+    - si
+    - sì
+    - esatto
+    - va bene
 
 - intent: deny
   examples: |
@@ -48,6 +77,7 @@ nlu:
     - don't like that
     - no way
     - not really
+    - nope
 
 - intent: bot_challenge
   examples: |
@@ -55,6 +85,8 @@ nlu:
     - are you a human?
     - am I talking to a bot?
     - am I talking to a human?
+    - sei un bot?
+    - sei umano?
 
 - intent: bot_abilities
   examples: |
@@ -71,6 +103,17 @@ nlu:
     - tell me what you are capable of
     - can you find games for me?
     - what is your purpose?
+    - tell me about yourself
+    - who are you?
+    - what do you do?
+    - help
+    - I need assistance
+    - guide me
+    - what games can you find?
+    - are you useful?
+    - cosa sai fare?
+    - aiutami
+    - come funzioni?
 
 - intent: out_of_scope
   examples: |
@@ -87,16 +130,559 @@ nlu:
     - i want to buy a car
     - can you clean my room?
 
+# ============================================================================
+# SEARCH GAME
+# ============================================================================
 
 - intent: search_game
   examples: |
     - I am looking for an [RPG](genre) game
-    - Recommend me a shooter
+    - Recommend me a [shooter](genre)
     - I want to play an [adventure](genre) game
     - Search games for [PS5](platform)
     - Find me an [action](genre) game for [Xbox](platform)
     - I need a [racing](genre) game
     - What are the best [indie](genre) games?
     - Show me [strategy](genre) games
+    - I want to find a game
+    - search for a game
+    - find games
+    - can you help me find a game?
+    - I'm looking for a game developed by [Valve](developer)
+    - games by [Ubisoft](developer)
+    - [Nintendo](developer) games
+    - I want a [platformer](genre) on [Switch](platform) made by [Nintendo](developer)
+    - suggest a game
+    - I'm bored, find me a game
+    - what should I play?
+    - give me game recommendations
+    - I need a new game
+    - search for [RPG](genre) games
+    - find [multiplayer](genre) games on [PC](platform)
+    - show me [indie](genre) titles
+    - recommend [strategy](genre) games by [Paradox](developer)
+    - find me some [Ubisoft](developer)'s games
+    - show me [Valve](developer)'s games
+    - [EA](developer) games
+    - [Bethesda](developer) titles
+    - [action](genre) games for [PlayStation 5](platform)
+    - [adventure](genre) titles on [Nintendo Switch](platform)
+    - best [racing](genre) games for [Xbox Series X](platform)
+    - [FromSoftware](developer) [RPG](genre) games
+    - [Rockstar Games](developer) titles for [pc](platform)
+    - [Sony](developer) exclusives for [PS5](platform)
+    - [fighting](genre) games by [Capcom](developer)
+    - [puzzle](genre) games on [mobile](platform)
+    - [simulation](genre) games for [PC](platform)
+    - [sports](genre) games on [ps4](platform)
+    - something like [Dark Souls](genre)
+    - games similar to [Skyrim](genre)
 
+# ============================================================================
+# SEARCH GAME BY NAME
+# ============================================================================
 
+- intent: search_game_by_name
+  examples: |
+    - find [Minecraft](game_title)
+    - search [Fortnite](game_title)
+    - looking for [Valorant](game_title)
+    - find [minecraft](game_title)
+    - search [fortnite](game_title)
+    - find [Portal 2](game_title)
+    - search [Diablo IV](game_title)
+    - looking for [GTA 5](game_title)
+    - find [portal 2](game_title)
+    - search [diablo iv](game_title)
+    - find [God of War](game_title)
+    - search [Elden Ring](game_title)
+    - looking for [Red Dead Redemption 2](game_title)
+    - find [god of war](game_title)
+    - search [elden ring](game_title)
+    - looking for [red dead redemption 2](game_title)
+    - find [God of War Ragnarok](game_title)
+    - search [The Witcher 3: Wild Hunt](game_title)
+    - looking for [The Legend of Zelda: Tears of the Kingdom](game_title)
+    - find [Call of Duty: Modern Warfare II](game_title)
+    - search [Star Wars Jedi: Survivor](game_title)
+    - find [god of war ragnarok](game_title)
+    - search [the witcher 3: wild hunt](game_title)
+    - looking for [the legend of zelda: tears of the kingdom](game_title)
+    - find [call of duty: modern warfare ii](game_title)
+    - search [star wars jedi: survivor](game_title)
+    - I want to find [Cyberpunk 2077](game_title)
+    - Do you know [Baldur's Gate 3](game_title)?
+    - tell me about [Horizon Forbidden West](game_title)
+    - info on [Dark Souls](game_title)
+    - I want to play [Assassin's Creed Valhalla](game_title)
+    - show me [Spider-Man: Miles Morales](game_title)
+    - [Final Fantasy VII Remake](game_title) please
+    - what about [Bloodborne](game_title)?
+    - can you find [Genshin Impact](game_title)?
+    - i want to find [cyberpunk 2077](game_title)
+    - tell me about [horizon forbidden west](game_title)
+    - i want to play [assassin's creed valhalla](game_title)
+    - show me [spider-man: miles morales](game_title)
+    - [final fantasy vii remake](game_title) please
+    - what about [bloodborne](game_title)?
+    - can you find [genshin impact](game_title)?
+
+# ============================================================================
+# GAME DETAILS
+# ============================================================================
+
+- intent: game_details
+  examples: |
+    - Show me details
+    - I want to know more
+    - details please
+    - more info
+    - tell me more about it
+    - show details
+    - what is it about?
+    - description
+    - show me the rating
+    - when was it released?
+    - who made it?
+    - tell me about the story
+    - is it good?
+    - what's the rating?
+    - give me the description
+    - show info
+    - details
+    - expand on this
+    - I want to see more
+    - more information
+    - full details
+    - complete info
+
+# ============================================================================
+# INFORM
+# ============================================================================
+
+- intent: inform
+  examples: |
+    - [PC](platform)
+    - [PS5](platform)
+    - [Switch](platform)
+    - [Action](genre)
+    - [RPG](genre)
+    - [Shooter](genre)
+    - [Valve](developer)
+    - [Ubisoft](developer)
+    - [Nintendo](developer)
+    - [Electronic Arts](developer)
+    - [Sony](developer)
+    - [Microsoft](developer)
+    - [Capcom](developer)
+    - [Sega](developer)
+    - [Square Enix](developer)
+    - [Bandai Namco](developer)
+    - [Konami](developer)
+    - [Bethesda](developer)
+    - [Rockstar Games](developer)
+    - [CD Projekt Red](developer)
+    - [Naughty Dog](developer)
+    - [Insomniac Games](developer)
+    - [Santa Monica Studio](developer)
+    - [Guerrilla Games](developer)
+    - [Sucker Punch Productions](developer)
+    - [FromSoftware](developer)
+    - [Kojima Productions](developer)
+    - [PlatinumGames](developer)
+    - [Atlus](developer)
+    - [Level-5](developer)
+    - [Game Freak](developer)
+    - [Intelligent Systems](developer)
+    - [HAL Laboratory](developer)
+    - [Monolith Soft](developer)
+    - [Retro Studios](developer)
+    - [Rare](developer)
+    - [Mojang](developer)
+    - [Obsidian Entertainment](developer)
+    - [BioWare](developer)
+    - [Respawn Entertainment](developer)
+    - [Infinity Ward](developer)
+    - [Treyarch](developer)
+    - [Blizzard Entertainment](developer)
+    - [Riot Games](developer)
+    - [Epic Games](developer)
+    - [Valve Corporation](developer)
+
+- intent: skip
+  examples: |
+    - skip
+    - next
+    - pass
+    - nothing
+    - I don't care
+    - doesn't matter
+    - any
+    - whatever
+    - no preference
+    - skip this
+    - skip please
+    - go to next
+    - ignore
+    - leave empty
+    - don't specify
+
+# ============================================================================
+# LOOKUP TABLES
+# ============================================================================
+
+- lookup: game_title
+  examples: |
+    - God of War
+    - god of war
+    - GOW
+    - God of War Ragnarök
+    - God of War Ragnarok
+    - god of war ragnarok
+    - GOW Ragnarok
+    - The Witcher 3: Wild Hunt
+    - the witcher 3: wild hunt
+    - The Witcher 3
+    - the witcher 3
+    - Witcher 3
+    - witcher 3
+    - TW3
+    - Horizon Forbidden West
+    - horizon forbidden west
+    - HFW
+    - Horizon Forbidden West: Burning Shores
+    - Horizon Zero Dawn
+    - horizon zero dawn
+    - HZD
+    - Red Dead Redemption 2
+    - red dead redemption 2
+    - RDR2
+    - Red Dead 2
+    - Cyberpunk 2077
+    - cyberpunk 2077
+    - CP2077
+    - Cyberpunk 2077: Phantom Liberty
+    - Elden Ring
+    - elden ring
+    - Elden Ring: Shadow of the Erdtree
+    - The Legend of Zelda: Tears of the Kingdom
+    - the legend of zelda: tears of the kingdom
+    - Zelda TOTK
+    - TOTK
+    - Tears of the Kingdom
+    - The Legend of Zelda: Breath of the Wild
+    - the legend of zelda: breath of the wild
+    - Zelda BOTW
+    - BOTW
+    - Breath of the Wild
+    - Baldur's Gate 3
+    - baldur's gate 3
+    - BG3
+    - Baldurs Gate 3
+    - Marvel's Spider-Man 2
+    - marvel's spider-man 2
+    - Spider-Man 2
+    - spider-man 2
+    - Spiderman 2
+    - Spider-Man: Miles Morales
+    - spider-man: miles morales
+    - Miles Morales
+    - Star Wars Jedi: Survivor
+    - star wars jedi: survivor
+    - Jedi Survivor
+    - Star Wars Jedi: Fallen Order
+    - star wars jedi: fallen order
+    - Jedi Fallen Order
+    - Hogwarts Legacy
+    - hogwarts legacy
+    - Final Fantasy XVI
+    - final fantasy xvi
+    - FF16
+    - FFXVI
+    - Final Fantasy VII Remake
+    - final fantasy vii remake
+    - FF7 Remake
+    - FFVII Remake
+    - Final Fantasy VII Remake Intergrade
+    - Resident Evil 4
+    - resident evil 4
+    - RE4
+    - Resident Evil 4 Remake
+    - Street Fighter 6
+    - street fighter 6
+    - SF6
+    - Diablo IV
+    - diablo iv
+    - Diablo 4
+    - diablo 4
+    - D4
+    - Overwatch 2
+    - overwatch 2
+    - OW2
+    - Call of Duty: Modern Warfare II
+    - call of duty: modern warfare ii
+    - COD MW2
+    - Modern Warfare 2
+    - MW2
+    - Call of Duty: Modern Warfare III
+    - call of duty: modern warfare iii
+    - COD MW3
+    - Modern Warfare 3
+    - MW3
+    - Assassin's Creed Mirage
+    - assassin's creed mirage
+    - AC Mirage
+    - Assassin's Creed Valhalla
+    - assassin's creed valhalla
+    - AC Valhalla
+    - Valhalla
+    - Grand Theft Auto V
+    - grand theft auto v
+    - GTA V
+    - gta v
+    - GTA 5
+    - gta 5
+    - Grand Theft Auto VI
+    - grand theft auto vi
+    - GTA VI
+    - gta vi
+    - GTA 6
+    - gta 6
+    - Fortnite
+    - fortnite
+    - Minecraft
+    - minecraft
+    - Roblox
+    - roblox
+    - League of Legends
+    - league of legends
+    - LOL
+    - LoL
+    - Valorant
+    - valorant
+    - Apex Legends
+    - apex legends
+    - Apex
+    - Counter-Strike 2
+    - counter-strike 2
+    - CS2
+    - Counter Strike 2
+    - Dota 2
+    - dota 2
+    - DOTA 2
+    - Rocket League
+    - rocket league
+    - RL
+    - Genshin Impact
+    - genshin impact
+    - Genshin
+    - Honkai: Star Rail
+    - honkai: star rail
+    - Star Rail
+    - HSR
+    - Palworld
+    - palworld
+    - Helldivers 2
+    - helldivers 2
+    - Dragon's Dogma 2
+    - dragon's dogma 2
+    - Dragons Dogma 2
+    - DD2
+    - Alan Wake 2
+    - alan wake 2
+    - AW2
+    - Super Mario Bros. Wonder
+    - super mario bros. wonder
+    - Mario Wonder
+    - Super Mario Odyssey
+    - super mario odyssey
+    - Mario Odyssey
+    - Mario Kart 8 Deluxe
+    - mario kart 8 deluxe
+    - MK8
+    - Mario Kart 8
+    - Super Smash Bros. Ultimate
+    - super smash bros. ultimate
+    - Smash Ultimate
+    - SSBU
+    - The Last of Us Part II
+    - the last of us part ii
+    - TLOU2
+    - Last of Us 2
+    - The Last of Us Part I
+    - the last of us part i
+    - TLOU1
+    - Last of Us 1
+    - Uncharted 4: A Thief's End
+    - uncharted 4: a thief's end
+    - Uncharted 4
+    - Ghost of Tsushima
+    - ghost of tsushima
+    - Ghost of Tsushima: Director's Cut
+    - Death Stranding
+    - death stranding
+    - Death Stranding: Director's Cut
+    - Bloodborne
+    - bloodborne
+    - Demon's Souls
+    - demon's souls
+    - Demons Souls
+    - Dark Souls
+    - dark souls
+    - Dark Souls III
+    - dark souls iii
+    - Dark Souls 3
+    - DS3
+    - Sekiro: Shadows Die Twice
+    - sekiro: shadows die twice
+    - Sekiro
+    - The Elder Scrolls V: Skyrim
+    - the elder scrolls v: skyrim
+    - Skyrim
+    - skyrim
+    - TES V
+    - The Elder Scrolls VI
+    - the elder scrolls vi
+    - TES VI
+    - Fallout 4
+    - fallout 4
+    - Fallout 76
+    - fallout 76
+    - Halo Infinite
+    - halo infinite
+    - Halo
+    - Portal 2
+    - portal 2
+    - Portal
+    - Half-Life: Alyx
+    - half-life: alyx
+    - Half Life Alyx
+    - Hollow Knight
+    - hollow knight
+    - Hollow Knight: Silksong
+    - Silksong
+    - Metroid Prime 4
+    - metroid prime 4
+    - BioShock
+    - bioshock
+    - Among Us
+    - among us
+    - Fall Guys
+    - fall guys
+    - Tetris
+    - tetris
+    - Monster Hunter World
+    - monster hunter world
+    - MHW
+    - Monster Hunter World: Iceborne
+    - Destiny 2
+    - destiny 2
+    - Destiny 2: The Witch Queen
+
+- lookup: genre
+  examples: |
+    - action
+    - indie
+    - adventure
+    - rpg
+    - role-playing
+    - strategy
+    - shooter
+    - casual
+    - simulation
+    - puzzle
+    - arcade
+    - platformer
+    - massively multiplayer
+    - mmo
+    - mmorpg
+    - racing
+    - sports
+    - fighting
+    - family
+    - board games
+    - board
+    - card
+    - educational
+    - survival
+    - horror
+    - stealth
+    - open world
+    - sandbox
+    - battle royale
+    - fps
+    - first-person shooter
+    - tps
+    - third-person shooter
+    - hack and slash
+    - souls-like
+    - soulslike
+    - metroidvania
+    - roguelike
+    - roguelite
+    - tower defense
+    - real-time strategy
+    - rts
+    - turn-based
+    - visual novel
+    - rhythm
+    - music
+
+- lookup: platform
+  examples: |
+    - pc
+    - playstation 5
+    - ps5
+    - playstation 4
+    - ps4
+    - xbox one
+    - xbox series s/x
+    - xbox series x
+    - xbox series s
+    - nintendo switch
+    - switch
+    - ios
+    - android
+    - mobile
+    - nintendo 3ds
+    - 3ds
+    - macos
+    - mac
+    - linux
+    - xbox 360
+    - xbox
+    - playstation 3
+    - ps3
+    - playstation 2
+    - ps2
+    - playstation
+    - ps1
+    - psx
+    - ps vita
+    - vita
+    - psp
+    - wii u
+    - wii
+    - gamecube
+    - nintendo 64
+    - n64
+    - game boy advance
+    - gba
+    - game boy
+    - gb
+    - snes
+    - nes
+    - genesis
+    - sega genesis
+    - dreamcast
+
+- regex: game_title_with_numbers
+  examples: |
+    - \b[A-Z][a-zA-Z\s:'-]*\d+\b
+    - \bGTA\s*[IVX0-9]+\b
+    - \b[A-Z]{2,}\s*\d+\b
+
+- regex: game_sequel_pattern
+  examples: |
+    - \b\w+\s*(2|3|4|5|II|III|IV|V|VI)\b
+    - \b\w+:\s*[A-Z][a-z]+\b

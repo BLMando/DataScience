@@ -26,3 +26,68 @@ rules:
   steps:
   - intent: nlu_fallback
   - action: utter_fallback
+- rule: Activate game search form
+  steps:
+  - intent: search_game
+  - action: game_search_form
+  - active_loop: game_search_form
+
+- rule: Submit game search form
+  condition:
+  - active_loop: game_search_form
+  steps:
+  - action: game_search_form
+  - active_loop: null
+  - slot_was_set:
+    - requested_slot: null
+  - action: utter_submit_game_search_form
+  - action: action_search_game
+
+- rule: Direct game search by name
+  condition:
+  - active_loop: game_search_form
+  steps:
+  - intent: search_game_by_name
+  - active_loop: null
+  - action: action_search_game
+
+- rule: Direct game search by name (no loop)
+  condition:
+  - active_loop: null
+  steps:
+  - intent: search_game_by_name
+  - action: action_search_game
+
+- rule: Show game details
+  steps:
+  - intent: game_details
+  - action: action_game_details
+
+- rule: Handle deny after search
+  steps:
+  - intent: deny
+  - action: utter_deny_details
+
+
+- rule: Interruption - Bot Challenge
+  condition:
+  - active_loop: game_search_form
+  steps:
+  - intent: bot_challenge
+  - action: utter_iamabot
+  - action: game_search_form
+
+- rule: Interruption - Search by Name
+  condition:
+  - active_loop: game_search_form
+  steps:
+  - intent: search_game_by_name
+  - active_loop: null
+  - action: action_search_game
+
+- rule: Handle Skip outside form
+  condition:
+  - active_loop: null
+  steps:
+  - intent: skip
+  - action: utter_fallback

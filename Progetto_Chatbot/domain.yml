@@ -8,12 +8,18 @@ intents:
   - bot_challenge
   - bot_abilities
   - search_game
+  - search_game_by_name
+  - game_details
+  - inform
+  - skip
 
 
 entities:
   - game_title
   - genre
   - platform
+  - developer
+  - game_id
 
 slots:
   game_title:
@@ -26,39 +32,129 @@ slots:
     mappings:
       - type: from_entity
         entity: genre
+      - type: from_intent
+        intent: skip
+        value: "skipped"
+        conditions:
+        - active_loop: game_search_form
+          requested_slot: genre
   platform:
     type: text
     mappings:
       - type: from_entity
         entity: platform
+      - type: from_intent
+        intent: skip
+        value: "skipped"
+        conditions:
+        - active_loop: game_search_form
+          requested_slot: platform
+  developer:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: developer
+      - type: from_intent
+        intent: skip
+        value: "skipped"
+        conditions:
+        - active_loop: game_search_form
+          requested_slot: developer
+  game_id:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: game_id
+
+forms:
+  game_search_form:
+    required_slots:
+        - platform
+        - genre
+        - developer
 
 responses:
   utter_greet:
-    - text: "Hi! I'm GameGuru. Your personal game assistant! How can i help you?"
+    - text: "Greetings, traveler! ⚔️ I'm GameGuru. Ready to embark on a quest for your next favorite game?"
+    - text: "Insert coin to start! 🪙 Just kidding, I'm free. I'm GameGuru, how can I help you level up your library?"
+    - text: "Hey there! 🎮 Ready to find some epic loot (games)?"
   
   utter_bot_abilities:
-    - text: "Hi! I'm your game assistant. Here's what i can do for you: 
-            \n - I can help you find games." 
+    - text: "I'm a level 99 Game Assistant! 🧙‍♂️\nI can help you find games by:\n- 🎭 Genre\n- 💻 Platform\n- 🏢 Developer\n\nJust ask me to 'find a game' or 'search for [Game Name]'!"
+    - text: "My main quest is to help you discover games. 🗺️\nI can search for specific titles or recommend games based on your preferences. Try me!" 
   
   utter_goodbye:
-    - text: "Goodbye! Have a nice day!"
+    - text: "Game Over! 👾 Thanks for playing. See you next time!"
+    - text: "Logging out... 🔌 May your framerates be high and your temperatures low!"
+    - text: "AFK for now. 👋 Have a great session!"
 
   utter_iamabot:
-    - text: "I am a bot, powered by Rasa."
+    - text: "I am a bot, powered by Rasa and infinite loops of coffee. ☕🤖"
+    - text: "I'm an NPC (Non-Player Character) here to guide you. 🤖"
 
   utter_out_of_scope:
-    - text: "I'm sorry, I can't help you with that."
+    - text: "That's outside my render distance! 🌫️ I only know about video games."
+    - text: "Error 404: Knowledge not found. 🚫 Let's stick to gaming topics!"
+    - text: "My skill tree doesn't cover that yet. 🌳 Ask me about games instead!"
+
 
   utter_fallback:
-    # - buttons:
-    #   - title: geo-joke
-    #     payload: /geo-joke
-    #   - title: geo-curiosity
-    #     payload: /geo-curiosity
-    - text: Sorry! I couldn't get you! Please use one of the following options.
+    - text: "Lag spike! 📶 I didn't catch that. What would you like to do?"
+      buttons:
+        - title: "🔍 Search for a Game"
+          payload: "/search_game"
+        - title: "🎮 Search by Name"
+          payload: "/search_game_by_name"
+        - title: "❓ Help"
+          payload: "/bot_abilities"
+
+  utter_ask_platform:
+    - text: "Choose your weapon! ⚔️ Which platform? (PC, PS5, Xbox, etc. or type 'skip')"
+    - text: "Where will you be playing? 🕹️ (e.g., PC, Switch, PS4... or 'skip')"
+
+  utter_ask_genre:
+    - text: "Pick your class! 🛡️ What genre interests you? (Action, RPG, Strategy... or 'skip')"
+    - text: "What kind of adventure are you looking for? 🗺️ (e.g., Shooter, Adventure, or 'skip')"
+
+  utter_ask_developer:
+    - text: "Do you have a favorite creator? 🎨 (e.g., Valve, Ubisoft, Nintendo... or 'skip')"
+    - text: "Any specific studio you're loyal to? 🏢 (or type 'skip')"
+  
+  utter_submit_game_search_form:
+    - text: "Scanning the database... 📡"
+    - text: "Loading results... ⏳"
+
+  utter_game_not_found:
+    - text: "Empty chest! 📦 I couldn't find any games matching your request."
+    - text: "Mission failed! ❌ No games found. Try different criteria"
+
+  utter_ask_game_details:
+    - text: "Do you want to see more details?"
+      buttons:
+        - title: "Yes"
+          payload: "/game_details"
+        - title: "No"
+          payload: "/deny"
+
+  utter_ask_game_confirm:
+    - text: "Is this the game you are looking for?"
+      buttons:
+        - title: "Yes"
+          payload: "/game_details"
+        - title: "No"
+          payload: "/search_game_by_name"
+
+  utter_deny_details:
+    - text: "Understood! Let me know if you want to search again. 🚀"
+
+  utter_ask_game_name:
+    - text: "Sure! What is the name of the game you are looking for? 🕵️‍♂️"
+
 actions:
   - action_search_game
+  - action_game_details
   - action_my_fallback
+  - validate_game_search_form
 
 config:
   store_entities_as_slots: true

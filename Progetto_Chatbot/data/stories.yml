@@ -2,49 +2,58 @@ version: "3.1"
 
 stories:
 
-- story: Search and Goodbye
-  steps:
-  - intent: greet
-  - action: utter_greet
-  - intent: search_game
-  - action: action_search_game
-  - intent: goodbye
-  - action: utter_goodbye
 
-- story: Simple Search (Genre)
+
+- story: Game Search Form Happy Path
   steps:
   - intent: greet
   - action: utter_greet
   - intent: search_game
-    entities:
-    - genre: "rpg"
+  - action: game_search_form
+  - active_loop: game_search_form
+  - active_loop: null
   - slot_was_set:
-    - genre: "rpg"
+    - requested_slot: null
+  - action: utter_submit_game_search_form
   - action: action_search_game
 
-- story: Simple Search (Platform)
+- story: Game Search Form with Skip
   steps:
   - intent: greet
   - action: utter_greet
   - intent: search_game
-    entities:
-    - platform: "ps5"
+  - action: game_search_form
+  - active_loop: game_search_form
+  - intent: skip
+  - action: game_search_form
+  - active_loop: null
   - slot_was_set:
-    - platform: "ps5"
+    - requested_slot: null
+  - action: utter_submit_game_search_form
   - action: action_search_game
 
-- story: Complex Search (Genre + Platform)
+
+
+- story: Game Search by Title
   steps:
-  - intent: greet
-  - action: utter_greet
-  - intent: search_game
-    entities:
-    - genre: "action"
-    - platform: "pc"
+  - intent: search_game_by_name
   - slot_was_set:
-    - genre: "action"
-    - platform: "pc"
+    - game_title: "The Witcher 3"
   - action: action_search_game
+  - slot_was_set:
+    - game_id: "123"
 
+- story: Game Search by Title and Details
+  steps:
+  - intent: search_game_by_name
+  - slot_was_set:
+    - game_title: "The Witcher 3"
+  - action: action_search_game
+  - intent: game_details
+  - action: action_game_details
 
-
+- story: Game Details Context
+  steps:
+  - action: action_search_game
+  - intent: game_details
+  - action: action_game_details
