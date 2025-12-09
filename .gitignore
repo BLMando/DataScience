@@ -210,3 +210,4 @@ docs/
 *.txt
 models/
 .rasa/
+Progetto_Chatbot/.rasa/cache/cache.db

@@ -1,0 +1,4 @@
+.rasa/
+.env/
+models/
+credentials.yml

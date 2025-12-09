@@ -19,12 +19,12 @@ pipeline:
     analyzer: word
     min_ngram: 1
     max_ngram: 2
-    OOV_token: "_OOV_" # Out of Vocabulary token for unknown words
+    OOV_token: "_oov_" # Out of Vocabulary token for unknown words
   - name: CountVectorsFeaturizer
     analyzer: char_wb
     min_ngram: 2
     max_ngram: 4
-    OOV_token: "_OOV_" # Out of Vocabulary token for unknown words
+    OOV_token: "_oov_" # Out of Vocabulary token for unknown words
   - name: RegexEntityExtractor
     case_sensitive: False
     use_lookup_tables: True
@@ -33,8 +33,8 @@ pipeline:
   - name: CRFEntityExtractor
     BILOU_flag: True
   - name: DIETClassifier
-    epochs: 200                  
-    BILOU_flag: True               
+    epochs: 200
+    BILOU_flag: True
     entity_recognition: true
     constrain_similarities: true
   - name: EntitySynonymMapper
