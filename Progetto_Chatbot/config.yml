@@ -4,7 +4,7 @@ recipe: default.v1
 
 # The assistant project unique identifier
 # This default value must be replaced with a unique assistant name within your deployment
-assistant_id: 20251114-121525-miniature-delta
+assistant_id: 20251209-192753-huge-pitch
 
 # Configuration for Rasa NLU.
 # https://rasa.com/docs/rasa/nlu/components/
@@ -16,11 +16,13 @@ pipeline:
     case_sensitive: False
   - name: LexicalSyntacticFeaturizer
   - name: CountVectorsFeaturizer
+    case_sensitive: False
     analyzer: word
     min_ngram: 1
     max_ngram: 2
     OOV_token: "_oov_" # Out of Vocabulary token for unknown words
   - name: CountVectorsFeaturizer
+    case_sensitive: False
     analyzer: char_wb
     min_ngram: 2
     max_ngram: 4
@@ -42,13 +44,13 @@ pipeline:
     epochs: 100
     constrain_similarities: true
   - name: FallbackClassifier
-    threshold: 0.7
+    threshold: 0.4
     ambiguity_threshold: 0.1
 
 policies:
   - name: MemoizationPolicy
   - name: RulePolicy
-    core_fallback_threshold: 0.7
+    core_fallback_threshold: 0.3
     core_fallback_action_name: "action_my_fallback"
     enable_fallback_prediction: true
   - name: UnexpecTEDIntentPolicy
