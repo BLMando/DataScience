@@ -1,684 +1,860 @@
 version: "3.1"
 
 nlu:
-# ============================================================================
-# BASE INTENTS
-# ============================================================================
+  # ============================================================================
+  # BASE INTENTS
+  # ============================================================================
 
-- intent: greet
-  examples: |
-    - hey
-    - hello
-    - hi
-    - hello there
-    - good morning
-    - good evening
-    - moin
-    - hey there
-    - let's go
-    - hey dude
-    - goodmorning
-    - goodevening
-    - good afternoon
-    - yo
-    - hi there
-    - greetings
-    - hello bot
-    - start
-    - wake up
-    - good day
-    - what's up
-    - howdy
+  - intent: greet
+    examples: |
+      - hey
+      - hello
+      - hi
+      - hello there
+      - good morning
+      - good evening
+      - moin
+      - hey there
+      - let's go
+      - hey dude
+      - goodmorning
+      - goodevening
+      - good afternoon
+      - yo
+      - hi there
+      - greetings
+      - hello bot
+      - start
+      - wake up
+      - good day
+      - what's up
+      - howdy
 
-- intent: goodbye
-  examples: |
-    - cu
-    - good by
-    - see you later
-    - good night
-    - bye
-    - goodbye
-    - have a nice day
-    - see you around
-    - bye bye
-    - see you later
-    - catch you later
-    - I'm out
-    - quit
-    - end session
-    - stop
-    - exit
-    - later
-    - peace out
+  - intent: goodbye
+    examples: |
+      - cu
+      - good by
+      - see you later
+      - good night
+      - bye
+      - goodbye
+      - have a nice day
+      - see you around
+      - bye bye
+      - see you later
+      - catch you later
+      - I'm out
+      - quit
+      - end session
+      - stop
+      - exit
+      - later
+      - peace out
 
-- intent: affirm
-  examples: |
-    - yes
-    - y
-    - indeed
-    - of course
-    - that sounds good
-    - correct
-    - si
-    - sì
-    - esatto
-    - va bene
+  - intent: affirm
+    examples: |
+      - yes
+      - y
+      - indeed
+      - of course
+      - that sounds good
+      - correct
+      - si
+      - sì
+      - esatto
+      - va bene
+      - oc
 
-- intent: deny
-  examples: |
-    - no
-    - n
-    - never
-    - I don't think so
-    - don't like that
-    - no way
-    - not really
-    - nope
+  - intent: deny
+    examples: |
+      - no
+      - n
+      - never
+      - I don't think so
+      - don't like that
+      - no way
+      - not really
+      - nope
 
-- intent: bot_challenge
-  examples: |
-    - are you a bot?
-    - are you a human?
-    - am I talking to a bot?
-    - am I talking to a human?
-    - sei un bot?
-    - sei umano?
+  - intent: bot_challenge
+    examples: |
+      - are you a bot?
+      - are you a human?
+      - am I talking to a bot?
+      - am I talking to a human?
+      - sei un bot?
+      - sei umano?
 
-- intent: bot_abilities
-  examples: |
-    - what can you do?
-    - what are your capabilities?
-    - what can you help me with?
-    - what can you do for me?
-    - what are your skills?
-    - can you recommend games?
-    - how does this work?
-    - help me
-    - show me what you can do
-    - list your features
-    - tell me what you are capable of
-    - can you find games for me?
-    - what is your purpose?
-    - tell me about yourself
-    - who are you?
-    - what do you do?
-    - help
-    - I need assistance
-    - guide me
-    - what games can you find?
-    - are you useful?
-    - cosa sai fare?
-    - aiutami
-    - come funzioni?
+  - intent: bot_abilities
+    examples: |
+      - what can you do?
+      - what are your capabilities?
+      - what can you help me with?
+      - what can you do for me?
+      - what are your skills?
+      - can you recommend games?
+      - how does this work?
+      - help me
+      - show me what you can do
+      - list your features
+      - tell me what you are capable of
+      - can you find games for me?
+      - what is your purpose?
+      - tell me about yourself
+      - who are you?
+      - what do you do?
+      - help
+      - I need assistance
+      - guide me
+      - what games can you find?
+      - are you useful?
+      - cosa sai fare?
+      - aiutami
+      - come funzioni?
 
-- intent: out_of_scope
-  examples: |
-    - How do i fix my car?
-    - How tall is Mount Everest?
-    - what is the weather like?
-    - order a pizza
-    - who is the president of usa?
-    - translate this to spanish
-    - book a flight to london
-    - tell me a joke
-    - how do i cook pasta?
-    - what is the capital of france?
-    - i want to buy a car
-    - can you clean my room?
+  - intent: out_of_scope
+    examples: |
+      - How do i fix my car?
+      - How tall is Mount Everest?
+      - what is the weather like?
+      - order a pizza
+      - who is the president of usa?
+      - translate this to spanish
+      - book a flight to london
+      - tell me a joke
+      - how do i cook pasta?
+      - what is the capital of france?
+      - i want to buy a car
+      - can you clean my room?
 
-# ============================================================================
-# SEARCH GAME
-# ============================================================================
+  # ============================================================================
+  # SEARCH GAME
+  # ============================================================================
 
-- intent: search_game
-  examples: |
-    - I am looking for an [RPG](genre) game
-    - Recommend me a [shooter](genre)
-    - I want to play an [adventure](genre) game
-    - Search games for [PS5](platform)
-    - Find me an [action](genre) game for [Xbox](platform)
-    - I need a [racing](genre) game
-    - What are the best [indie](genre) games?
-    - Show me [strategy](genre) games
-    - I want to find a game
-    - search for a game
-    - find games
-    - can you help me find a game?
-    - I'm looking for a game developed by [Valve](developer)
-    - games by [Ubisoft](developer)
-    - [Nintendo](developer) games
-    - I want a [platformer](genre) on [Switch](platform) made by [Nintendo](developer)
-    - suggest a game
-    - I'm bored, find me a game
-    - what should I play?
-    - give me game recommendations
-    - I need a new game
-    - search for [RPG](genre) games
-    - find [multiplayer](genre) games on [PC](platform)
-    - show me [indie](genre) titles
-    - recommend [strategy](genre) games by [Paradox](developer)
-    - find me some [Ubisoft](developer)'s games
-    - show me [Valve](developer)'s games
-    - [EA](developer) games
-    - [Bethesda](developer) titles
-    - [action](genre) games for [PlayStation 5](platform)
-    - [adventure](genre) titles on [Nintendo Switch](platform)
-    - best [racing](genre) games for [Xbox Series X](platform)
-    - [FromSoftware](developer) [RPG](genre) games
-    - [Rockstar Games](developer) titles for [pc](platform)
-    - [Sony](developer) exclusives for [PS5](platform)
-    - [fighting](genre) games by [Capcom](developer)
-    - [puzzle](genre) games on [mobile](platform)
-    - [simulation](genre) games for [PC](platform)
-    - [sports](genre) games on [ps4](platform)
-    - something like [Dark Souls](genre)
-    - games similar to [Skyrim](genre)
+  - intent: search_game
+    examples: |
+      - I am looking for an [RPG](genre) game
+      - Recommend me a [shooter](genre)
+      - I want to play an [adventure](genre) game
+      - Search games for [PS5](platform)
+      - Find me an [action](genre) game for [Xbox](platform)
+      - I need a [racing](genre) game
+      - What are the best [indie](genre) games?
+      - Show me [strategy](genre) games
+      - I want to find a game
+      - search for a game
+      - find games
+      - can you help me find a game?
+      - I'm looking for a game developed by [Valve](developer)
+      - games by [Ubisoft](developer)
+      - [Nintendo](developer) games
+      - I want a [platformer](genre) on [Switch](platform) made by [Nintendo](developer)
+      - suggest a game
+      - I'm bored, find me a game
+      - what should I play?
+      - give me game recommendations
+      - I need a new game
+      - search for [RPG](genre) games
+      - find [multiplayer](genre) games on [PC](platform)
+      - show me [indie](genre) titles
+      - recommend [strategy](genre) games by [Paradox](developer)
+      - find me some [Ubisoft](developer)'s games
+      - show me [Valve](developer)'s games
+      - [EA](developer) games
+      - [Bethesda](developer) titles
+      - [action](genre) games for [PlayStation 5](platform)
+      - [adventure](genre) titles on [Nintendo Switch](platform)
+      - best [racing](genre) games for [Xbox Series X](platform)
+      - [FromSoftware](developer) [RPG](genre) games
+      - [Rockstar Games](developer) titles for [pc](platform)
+      - [Sony](developer) exclusives for [PS5](platform)
+      - [fighting](genre) games by [Capcom](developer)
+      - [puzzle](genre) games on [mobile](platform)
+      - [simulation](genre) games for [PC](platform)
+      - [sports](genre) games on [ps4](platform)
+      - something like [Dark Souls](genre)
+      - games similar to [Skyrim](genre)
 
-# ============================================================================
-# SEARCH GAME BY NAME
-# ============================================================================
+  # ============================================================================
+  # SEARCH GAME BY NAME
+  # ============================================================================
 
-- intent: search_game_by_name
-  examples: |
-    - find [Minecraft](game_title)
-    - search [Fortnite](game_title)
-    - looking for [Valorant](game_title)
-    - find [minecraft](game_title)
-    - search [fortnite](game_title)
-    - find [Portal 2](game_title)
-    - search [Diablo IV](game_title)
-    - looking for [GTA 5](game_title)
-    - find [portal 2](game_title)
-    - search [diablo iv](game_title)
-    - find [God of War](game_title)
-    - search [Elden Ring](game_title)
-    - looking for [Red Dead Redemption 2](game_title)
-    - find [god of war](game_title)
-    - search [elden ring](game_title)
-    - looking for [red dead redemption 2](game_title)
-    - find [God of War Ragnarok](game_title)
-    - search [The Witcher 3: Wild Hunt](game_title)
-    - looking for [The Legend of Zelda: Tears of the Kingdom](game_title)
-    - find [Call of Duty: Modern Warfare II](game_title)
-    - search [Star Wars Jedi: Survivor](game_title)
-    - find [god of war ragnarok](game_title)
-    - search [the witcher 3: wild hunt](game_title)
-    - looking for [the legend of zelda: tears of the kingdom](game_title)
-    - find [call of duty: modern warfare ii](game_title)
-    - search [star wars jedi: survivor](game_title)
-    - I want to find [Cyberpunk 2077](game_title)
-    - Do you know [Baldur's Gate 3](game_title)?
-    - tell me about [Horizon Forbidden West](game_title)
-    - info on [Dark Souls](game_title)
-    - I want to play [Assassin's Creed Valhalla](game_title)
-    - show me [Spider-Man: Miles Morales](game_title)
-    - [Final Fantasy VII Remake](game_title) please
-    - what about [Bloodborne](game_title)?
-    - can you find [Genshin Impact](game_title)?
-    - i want to find [cyberpunk 2077](game_title)
-    - tell me about [horizon forbidden west](game_title)
-    - i want to play [assassin's creed valhalla](game_title)
-    - show me [spider-man: miles morales](game_title)
-    - [final fantasy vii remake](game_title) please
-    - what about [bloodborne](game_title)?
-    - can you find [genshin impact](game_title)?
+  - intent: search_game_by_name
+    examples: |
+      - find [Minecraft](game_title)
+      - search [Fortnite](game_title)
+      - looking for [Valorant](game_title)
+      - find [minecraft](game_title)
+      - search [fortnite](game_title)
+      - find [Portal 2](game_title)
+      - search [Diablo IV](game_title)
+      - looking for [GTA 5](game_title)
+      - find [portal 2](game_title)
+      - search [diablo iv](game_title)
+      - find [God of War](game_title)
+      - search [Elden Ring](game_title)
+      - looking for [Red Dead Redemption 2](game_title)
+      - find [god of war](game_title)
+      - search [elden ring](game_title)
+      - looking for [red dead redemption 2](game_title)
+      - find [God of War Ragnarok](game_title)
+      - search [The Witcher 3: Wild Hunt](game_title)
+      - looking for [The Legend of Zelda: Tears of the Kingdom](game_title)
+      - find [Call of Duty: Modern Warfare II](game_title)
+      - search [Star Wars Jedi: Survivor](game_title)
+      - find [god of war ragnarok](game_title)
+      - search [the witcher 3: wild hunt](game_title)
+      - looking for [the legend of zelda: tears of the kingdom](game_title)
+      - find [call of duty: modern warfare ii](game_title)
+      - search [star wars jedi: survivor](game_title)
+      - I want to find [Cyberpunk 2077](game_title)
+      - Do you know [Baldur's Gate 3](game_title)?
+      - tell me about [Horizon Forbidden West](game_title)
+      - info on [Dark Souls](game_title)
+      - I want to play [Assassin's Creed Valhalla](game_title)
+      - show me [Spider-Man: Miles Morales](game_title)
+      - [Final Fantasy VII Remake](game_title) please
+      - what about [Bloodborne](game_title)?
+      - can you find [Genshin Impact](game_title)?
+      - i want to find [cyberpunk 2077](game_title)
+      - tell me about [horizon forbidden west](game_title)
+      - i want to play [assassin's creed valhalla](game_title)
+      - show me [spider-man: miles morales](game_title)
+      - [final fantasy vii remake](game_title) please
+      - what about [bloodborne](game_title)?
+      - can you find [genshin impact](game_title)?
 
-# ============================================================================
-# GAME DETAILS
-# ============================================================================
+  # ============================================================================
+  # GAME DETAILS
+  # ============================================================================
 
-- intent: game_details
-  examples: |
-    - Show me details
-    - I want to know more
-    - details please
-    - more info
-    - tell me more about it
-    - show details
-    - what is it about?
-    - description
-    - show me the rating
-    - when was it released?
-    - who made it?
-    - tell me about the story
-    - is it good?
-    - what's the rating?
-    - give me the description
-    - show info
-    - details
-    - expand on this
-    - I want to see more
-    - more information
-    - full details
-    - complete info
+  - intent: game_details
+    examples: |
+      - Show me details
+      - I want to know more
+      - details please
+      - more info
+      - tell me more about it
+      - show details
+      - what is it about?
+      - description
+      - show me the rating
+      - when was it released?
+      - who made it?
+      - tell me about the story
+      - is it good?
+      - what's the rating?
+      - give me the description
+      - show info
+      - details
+      - expand on this
+      - I want to see more
+      - more information
+      - full details
+      - complete info
 
-# ============================================================================
-# INFORM
-# ============================================================================
+  # ============================================================================
+  # INFORM
+  # ============================================================================
 
-- intent: inform
-  examples: |
-    - [PC](platform)
-    - [PS5](platform)
-    - [Switch](platform)
-    - [Action](genre)
-    - [RPG](genre)
-    - [Shooter](genre)
-    - [Valve](developer)
-    - [Ubisoft](developer)
-    - [Nintendo](developer)
-    - [Electronic Arts](developer)
-    - [Sony](developer)
-    - [Microsoft](developer)
-    - [Capcom](developer)
-    - [Sega](developer)
-    - [Square Enix](developer)
-    - [Bandai Namco](developer)
-    - [Konami](developer)
-    - [Bethesda](developer)
-    - [Rockstar Games](developer)
-    - [CD Projekt Red](developer)
-    - [Naughty Dog](developer)
-    - [Insomniac Games](developer)
-    - [Santa Monica Studio](developer)
-    - [Guerrilla Games](developer)
-    - [Sucker Punch Productions](developer)
-    - [FromSoftware](developer)
-    - [Kojima Productions](developer)
-    - [PlatinumGames](developer)
-    - [Atlus](developer)
-    - [Level-5](developer)
-    - [Game Freak](developer)
-    - [Intelligent Systems](developer)
-    - [HAL Laboratory](developer)
-    - [Monolith Soft](developer)
-    - [Retro Studios](developer)
-    - [Rare](developer)
-    - [Mojang](developer)
-    - [Obsidian Entertainment](developer)
-    - [BioWare](developer)
-    - [Respawn Entertainment](developer)
-    - [Infinity Ward](developer)
-    - [Treyarch](developer)
-    - [Blizzard Entertainment](developer)
-    - [Riot Games](developer)
-    - [Epic Games](developer)
-    - [Valve Corporation](developer)
+  - intent: inform
+    examples: |
+      - [PC](platform)
+      - [PS5](platform)
+      - [Switch](platform)
+      - [Action](genre)
+      - [RPG](genre)
+      - [Shooter](genre)
+      - [Valve](developer)
+      - [Ubisoft](developer)
+      - [Nintendo](developer)
+      - [Electronic Arts](developer)
+      - [Sony](developer)
+      - [Microsoft](developer)
+      - [Capcom](developer)
+      - [Sega](developer)
+      - [Square Enix](developer)
+      - [Bandai Namco](developer)
+      - [Konami](developer)
+      - [Bethesda](developer)
+      - [Rockstar Games](developer)
+      - [CD Projekt Red](developer)
+      - [Naughty Dog](developer)
+      - [Insomniac Games](developer)
+      - [Santa Monica Studio](developer)
+      - [Guerrilla Games](developer)
+      - [Sucker Punch Productions](developer)
+      - [FromSoftware](developer)
+      - [Kojima Productions](developer)
+      - [PlatinumGames](developer)
+      - [Atlus](developer)
+      - [Level-5](developer)
+      - [Game Freak](developer)
+      - [Intelligent Systems](developer)
+      - [HAL Laboratory](developer)
+      - [Monolith Soft](developer)
+      - [Retro Studios](developer)
+      - [Rare](developer)
+      - [Mojang](developer)
+      - [Obsidian Entertainment](developer)
+      - [BioWare](developer)
+      - [Respawn Entertainment](developer)
+      - [Infinity Ward](developer)
+      - [Treyarch](developer)
+      - [Blizzard Entertainment](developer)
+      - [Riot Games](developer)
+      - [Epic Games](developer)
+      - [Valve Corporation](developer)
 
-- intent: skip
-  examples: |
-    - skip
-    - next
-    - pass
-    - nothing
-    - I don't care
-    - doesn't matter
-    - any
-    - whatever
-    - no preference
-    - skip this
-    - skip please
-    - go to next
-    - ignore
-    - leave empty
-    - don't specify
+  - intent: skip
+    examples: |
+      - skip
+      - next
+      - pass
+      - nothing
+      - I don't care
+      - doesn't matter
+      - any
+      - whatever
+      - no preference
+      - skip this
+      - skip please
+      - go to next
+      - ignore
+      - leave empty
+      - don't specify
 
-# ============================================================================
-# LOOKUP TABLES
-# ============================================================================
+  # ============================================================================
+  # COMPATIBILITY AND REQUIREMENTS
+  # ============================================================================
+  - intent: check_compatibility_with_platform
+    examples: |
+      - Is [God of War](game_title) available on [PS5](platform)?
+      - Will [Minecraft](game_title) run on [PC](platform)?
+      - Can I play [Super Mega Blaster](game_title) on [Switch](platform)?
+      - Is [Unknown Indie Gem](game_title) compatible with [Steam Deck](platform)?
+      - Does [Random RPG Title](game_title) support [Xbox](platform)?
+      - Will [My Cool Game](game_title) run on [Linux](platform)?
+      - Is [Space Simulator 9000](game_title) on [PS4](platform)?
+      - can i get [blue banana adventure](game_title) for [ios](platform)?
+      - will [Aragnaktor the destroyer](game_title) run on [macos](platform)?
+      - is [fantasy quest](game_title) compatible with [nintendo switch](platform)?
+      - does [speed racer x](game_title) support [xbox series x](platform)?
+      - can i play [ultimate fighting championship](game_title) on [ps5](platform)?
+      - do you know if [legend of the lost city](game_title) is available on [pc](platform)?
+      - Do you knwo that [Splitgate 2](game_title) is available on [Xbox Series X](platform)?
+      - Does [Halo](game_title) run on [Xbox One](platform)?
 
-- lookup: game_title
-  examples: |
-    - God of War
-    - god of war
-    - GOW
-    - God of War Ragnarök
-    - God of War Ragnarok
-    - god of war ragnarok
-    - GOW Ragnarok
-    - The Witcher 3: Wild Hunt
-    - the witcher 3: wild hunt
-    - The Witcher 3
-    - the witcher 3
-    - Witcher 3
-    - witcher 3
-    - TW3
-    - Horizon Forbidden West
-    - horizon forbidden west
-    - HFW
-    - Horizon Forbidden West: Burning Shores
-    - Horizon Zero Dawn
-    - horizon zero dawn
-    - HZD
-    - Red Dead Redemption 2
-    - red dead redemption 2
-    - RDR2
-    - Red Dead 2
-    - Cyberpunk 2077
-    - cyberpunk 2077
-    - CP2077
-    - Cyberpunk 2077: Phantom Liberty
-    - Elden Ring
-    - elden ring
-    - Elden Ring: Shadow of the Erdtree
-    - The Legend of Zelda: Tears of the Kingdom
-    - the legend of zelda: tears of the kingdom
-    - Zelda TOTK
-    - TOTK
-    - Tears of the Kingdom
-    - The Legend of Zelda: Breath of the Wild
-    - the legend of zelda: breath of the wild
-    - Zelda BOTW
-    - BOTW
-    - Breath of the Wild
-    - Baldur's Gate 3
-    - baldur's gate 3
-    - BG3
-    - Baldurs Gate 3
-    - Marvel's Spider-Man 2
-    - marvel's spider-man 2
-    - Spider-Man 2
-    - spider-man 2
-    - Spiderman 2
-    - Spider-Man: Miles Morales
-    - spider-man: miles morales
-    - Miles Morales
-    - Star Wars Jedi: Survivor
-    - star wars jedi: survivor
-    - Jedi Survivor
-    - Star Wars Jedi: Fallen Order
-    - star wars jedi: fallen order
-    - Jedi Fallen Order
-    - Hogwarts Legacy
-    - hogwarts legacy
-    - Final Fantasy XVI
-    - final fantasy xvi
-    - FF16
-    - FFXVI
-    - Final Fantasy VII Remake
-    - final fantasy vii remake
-    - FF7 Remake
-    - FFVII Remake
-    - Final Fantasy VII Remake Intergrade
-    - Resident Evil 4
-    - resident evil 4
-    - RE4
-    - Resident Evil 4 Remake
-    - Street Fighter 6
-    - street fighter 6
-    - SF6
-    - Diablo IV
-    - diablo iv
-    - Diablo 4
-    - diablo 4
-    - D4
-    - Overwatch 2
-    - overwatch 2
-    - OW2
-    - Call of Duty: Modern Warfare II
-    - call of duty: modern warfare ii
-    - COD MW2
-    - Modern Warfare 2
-    - MW2
-    - Call of Duty: Modern Warfare III
-    - call of duty: modern warfare iii
-    - COD MW3
-    - Modern Warfare 3
-    - MW3
-    - Assassin's Creed Mirage
-    - assassin's creed mirage
-    - AC Mirage
-    - Assassin's Creed Valhalla
-    - assassin's creed valhalla
-    - AC Valhalla
-    - Valhalla
-    - Grand Theft Auto V
-    - grand theft auto v
-    - GTA V
-    - gta v
-    - GTA 5
-    - gta 5
-    - Grand Theft Auto VI
-    - grand theft auto vi
-    - GTA VI
-    - gta vi
-    - GTA 6
-    - gta 6
-    - Fortnite
-    - fortnite
-    - Minecraft
-    - minecraft
-    - Roblox
-    - roblox
-    - League of Legends
-    - league of legends
-    - LOL
-    - LoL
-    - Valorant
-    - valorant
-    - Apex Legends
-    - apex legends
-    - Apex
-    - Counter-Strike 2
-    - counter-strike 2
-    - CS2
-    - Counter Strike 2
-    - Dota 2
-    - dota 2
-    - DOTA 2
-    - Rocket League
-    - rocket league
-    - RL
-    - Genshin Impact
-    - genshin impact
-    - Genshin
-    - Honkai: Star Rail
-    - honkai: star rail
-    - Star Rail
-    - HSR
-    - Palworld
-    - palworld
-    - Helldivers 2
-    - helldivers 2
-    - Dragon's Dogma 2
-    - dragon's dogma 2
-    - Dragons Dogma 2
-    - DD2
-    - Alan Wake 2
-    - alan wake 2
-    - AW2
-    - Super Mario Bros. Wonder
-    - super mario bros. wonder
-    - Mario Wonder
-    - Super Mario Odyssey
-    - super mario odyssey
-    - Mario Odyssey
-    - Mario Kart 8 Deluxe
-    - mario kart 8 deluxe
-    - MK8
-    - Mario Kart 8
-    - Super Smash Bros. Ultimate
-    - super smash bros. ultimate
-    - Smash Ultimate
-    - SSBU
-    - The Last of Us Part II
-    - the last of us part ii
-    - TLOU2
-    - Last of Us 2
-    - The Last of Us Part I
-    - the last of us part i
-    - TLOU1
-    - Last of Us 1
-    - Uncharted 4: A Thief's End
-    - uncharted 4: a thief's end
-    - Uncharted 4
-    - Ghost of Tsushima
-    - ghost of tsushima
-    - Ghost of Tsushima: Director's Cut
-    - Death Stranding
-    - death stranding
-    - Death Stranding: Director's Cut
-    - Bloodborne
-    - bloodborne
-    - Demon's Souls
-    - demon's souls
-    - Demons Souls
-    - Dark Souls
-    - dark souls
-    - Dark Souls III
-    - dark souls iii
-    - Dark Souls 3
-    - DS3
-    - Sekiro: Shadows Die Twice
-    - sekiro: shadows die twice
-    - Sekiro
-    - The Elder Scrolls V: Skyrim
-    - the elder scrolls v: skyrim
-    - Skyrim
-    - skyrim
-    - TES V
-    - The Elder Scrolls VI
-    - the elder scrolls vi
-    - TES VI
-    - Fallout 4
-    - fallout 4
-    - Fallout 76
-    - fallout 76
-    - Halo Infinite
-    - halo infinite
-    - Halo
-    - Portal 2
-    - portal 2
-    - Portal
-    - Half-Life: Alyx
-    - half-life: alyx
-    - Half Life Alyx
-    - Hollow Knight
-    - hollow knight
-    - Hollow Knight: Silksong
-    - Silksong
-    - Metroid Prime 4
-    - metroid prime 4
-    - BioShock
-    - bioshock
-    - Among Us
-    - among us
-    - Fall Guys
-    - fall guys
-    - Tetris
-    - tetris
-    - Monster Hunter World
-    - monster hunter world
-    - MHW
-    - Monster Hunter World: Iceborne
-    - Destiny 2
-    - destiny 2
-    - Destiny 2: The Witch Queen
+  # ============================================================================
+  # LOOKUP TABLES
+  # ============================================================================
 
-- lookup: genre
-  examples: |
-    - action
-    - indie
-    - adventure
-    - rpg
-    - role-playing
-    - strategy
-    - shooter
-    - casual
-    - simulation
-    - puzzle
-    - arcade
-    - platformer
-    - massively multiplayer
-    - mmo
-    - mmorpg
-    - racing
-    - sports
-    - fighting
-    - family
-    - board games
-    - board
-    - card
-    - educational
-    - survival
-    - horror
-    - stealth
-    - open world
-    - sandbox
-    - battle royale
-    - fps
-    - first-person shooter
-    - tps
-    - third-person shooter
-    - hack and slash
-    - souls-like
-    - soulslike
-    - metroidvania
-    - roguelike
-    - roguelite
-    - tower defense
-    - real-time strategy
-    - rts
-    - turn-based
-    - visual novel
-    - rhythm
-    - music
+  - regex: game_title
+    examples: |
+      - [A-Z][a-z]+(?:\s[A-Z][a-z]+)* # Matches "Title Case" words
 
-- lookup: platform
-  examples: |
-    - pc
-    - playstation 5
-    - ps5
-    - playstation 4
-    - ps4
-    - xbox one
-    - xbox series s/x
-    - xbox series x
-    - xbox series s
-    - nintendo switch
-    - switch
-    - ios
-    - android
-    - mobile
-    - nintendo 3ds
-    - 3ds
-    - macos
-    - mac
-    - linux
-    - xbox 360
-    - xbox
-    - playstation 3
-    - ps3
-    - playstation 2
-    - ps2
-    - playstation
-    - ps1
-    - psx
-    - ps vita
-    - vita
-    - psp
-    - wii u
-    - wii
-    - gamecube
-    - nintendo 64
-    - n64
-    - game boy advance
-    - gba
-    - game boy
-    - gb
-    - snes
-    - nes
-    - genesis
-    - sega genesis
-    - dreamcast
+  - lookup: game_title
+    examples: |
+      - God of War
+      - The Witcher 3
+      - Horizon Forbidden West
+      - Red Dead Redemption 2
+      - Cyberpunk 2077
+      - Elden Ring
+      - The Legend of Zelda: Tears of the Kingdom
+      - The Legend of Zelda: Breath of the Wild
+      - Baldur's Gate 3
+      - Marvel's Spider-Man 2
+      - Star Wars Jedi: Survivor
+      - Hogwarts Legacy
+      - Final Fantasy XVI
+      - Final Fantasy VII Remake
+      - Resident Evil 4
+      - Street Fighter 6
+      - Diablo IV
+      - Overwatch 2
+      - Call of Duty: Modern Warfare II
+      - Call of Duty: Modern Warfare III
+      - Assassin's Creed Mirage
+      - Assassin's Creed Valhalla
+      - Grand Theft Auto V
+      - Grand Theft Auto VI
+      - Fortnite
+      - Minecraft
+      - Roblox
+      - League of Legends
+      - Valorant
+      - Apex Legends
+      - Counter-Strike 2
+      - Dota 2
+      - Rocket League
+      - Genshin Impact
+      - Honkai: Star Rail
+      - Palworld
+      - Helldivers 2
+      - Dragon's Dogma 2
+      - Alan Wake 2
+      - Super Mario Bros. Wonder
+      - Super Mario Odyssey
+      - Mario Kart 8 Deluxe
+      - Super Smash Bros. Ultimate
+      - The Last of Us Part II
+      - The Last of Us Part I
+      - Uncharted 4
+      - Ghost of Tsushima
+      - Death Stranding
+      - Bloodborne
+      - Demon's Souls
+      - Dark Souls III
+      - Sekiro: Shadows Die Twice
+      - The Elder Scrolls V: Skyrim
+      - Fallout 4
+      - Halo Infinite
+      - Portal 2
+      - Half-Life: Alyx
+      - Hollow Knight
+      - Metroid Prime 4
+      - BioShock
+      - Among Us
+      - Fall Guys
+      - Monster Hunter World
+      - Destiny 2
 
-- regex: game_title_with_numbers
-  examples: |
-    - \b[A-Z][a-zA-Z\s:'-]*\d+\b
-    - \bGTA\s*[IVX0-9]+\b
-    - \b[A-Z]{2,}\s*\d+\b
+  - synonym: God of War
+    examples: |
+      - GOW
+      - God of War Ragnarök
+      - Ragnarok
+      - GOW Ragnarok
 
-- regex: game_sequel_pattern
-  examples: |
-    - \b\w+\s*(2|3|4|5|II|III|IV|V|VI)\b
-    - \b\w+:\s*[A-Z][a-z]+\b
+  - synonym: The Witcher 3
+    examples: |
+      - The Witcher 3: Wild Hunt
+      - Witcher 3
+      - TW3
+      - Wild Hunt
+
+  - synonym: Horizon Forbidden West
+    examples: |
+      - HFW
+      - Horizon Forbidden West: Burning Shores
+
+  - synonym: Horizon Zero Dawn
+    examples: |
+      - HZD
+      - Horizon 1
+
+  - synonym: Red Dead Redemption 2
+    examples: |
+      - RDR2
+      - Red Dead 2
+      - RDR 2
+
+  - synonym: Cyberpunk 2077
+    examples: |
+      - CP2077
+      - Cyberpunk 2077: Phantom Liberty
+      - Phantom Liberty
+
+  - synonym: "The Legend of Zelda: Tears of the Kingdom"
+    examples: |
+      - Zelda TOTK
+      - TOTK
+      - Tears of the Kingdom
+
+  - synonym: "The Legend of Zelda: Breath of the Wild"
+    examples: |
+      - Zelda BOTW
+      - BOTW
+      - Breath of the Wild
+
+  - synonym: Baldur's Gate 3
+    examples: |
+      - BG3
+      - Baldurs Gate 3
+
+  - synonym: Marvel's Spider-Man 2
+    examples: |
+      - Spider-Man 2
+      - Spiderman 2
+      - Spider Man 2
+
+  - synonym: "Call of Duty: Modern Warfare III"
+    examples: |
+      - COD MW3
+      - Modern Warfare 3
+      - MW3
+
+  - synonym: Grand Theft Auto V
+    examples: |
+      - GTA V
+      - GTA 5
+      - GTA5
+
+  - synonym: Grand Theft Auto VI
+    examples: |
+      - GTA VI
+      - GTA 6
+      - GTA6
+
+  - synonym: League of Legends
+    examples: |
+      - LOL
+      - LoL
+
+  - synonym: Counter-Strike 2
+    examples: |
+      - CS2
+      - Counter Strike 2
+      - CS 2
+
+  - synonym: "The Elder Scrolls V: Skyrim"
+    examples: |
+      - Skyrim
+      - TES V
+      - Elder Scrolls 5
+
+##############################################################################
+## genres
+##############################################################################
+  - lookup: genre
+    examples: |
+      - Action
+      - Adventure
+      - RPG
+      - Shooter
+      - Strategy
+      - Simulation
+      - Sports
+      - Racing
+      - Puzzle
+      - Horror
+      - Platformer
+      - Indie
+      - Fighting
+      - Sandbox
+      - Survival
+      - Multiplayer
+      - Open World
+      - Stealth
+      - Rhythm
+      - Educational
+      - Casual
+      - Family
+      - Party
+      - Trivia
+      - Visual Novel
+
+  - synonym: RPG
+    examples: |
+      - role playing
+      - role-playing
+      - role playing game
+      - role-playing game
+      - arpg
+      - jrpg
+      - crpg
+
+  - synonym: FPS
+    examples: |
+      - first person shooter
+      - first-person shooter
+      - first person
+      - fps game
+
+  - synonym: TPS
+    examples: |
+      - third person shooter
+      - third-person shooter
+      - third person
+
+  - synonym: Battle Royale
+    examples: |
+      - battle royal
+      - BR
+      - battlegrounds style
+
+  - synonym: Roguelike
+    examples: |
+      - roguelite
+      - rogue-like
+      - rogue-lite
+      - dungeon crawler
+
+  - synonym: Souls-like
+    examples: |
+      - soulslike
+      - soulsborne
+      - souls game
+
+  - synonym: Strategy
+    examples: |
+      - strategic
+      - tactics
+      - tactical
+      - grand strategy
+
+  - synonym: RTS
+    examples: |
+      - real time strategy
+      - real-time strategy
+
+  - synonym: MOBA
+    examples: |
+      - multiplayer online battle arena
+      - dota-like
+      - lol-like
+
+  - synonym: MMO
+    examples: |
+      - mmorpg
+      - massively multiplayer
+      - massive multiplayer
+      - mmo game
+
+  - synonym: Board Game
+    examples: |
+      - board
+      - tabletop
+      - board games
+
+  - synonym: Card Game
+    examples: |
+      - card
+      - deck builder
+      - deckbuilding
+      - tcg
+      - ccg
+
+  - synonym: Simulation
+    examples: |
+      - sim
+      - simulator
+      - management
+      - tycoon
+
+  - synonym: Fighting
+    examples: |
+      - fighting game
+      - beat em up
+      - beat 'em up
+      - brawler
+
+  - synonym: Visual Novel
+    examples: |
+      - vn
+      - interactive fiction
+      - dating sim
+
+  - synonym: Horror
+    examples: |
+      - scary
+      - spooky
+      - survival horror
+
+##############################################################################
+## platforms
+##############################################################################
+
+  - lookup: platform
+    examples: |
+      - Android
+      - Linux
+      - MacOS
+      - Nintendo 3DS
+      - Nintendo DS
+      - Nintendo Switch
+      - Nintendo Switch 2
+      - Nintendo Wii
+      - PS1
+      - PS2
+      - PS3
+      - PS4
+      - PS5
+      - PC
+      - Xbox 360
+      - Xbox One
+      - Xbox Series X
+      - iOS
+
+  # --- MOBILE ---
+  - synonym: iOS
+    examples: |
+      - ios
+      - iphone os
+      - apple ios
+      - ipados
+      - iphone
+      - ipad
+
+  - synonym: Android
+    examples: |
+      - android os
+      - google android
+      - droid
+      - huawei   # Fixed typo (was huwawei)
+      - samsung
+      - oneplus
+      - xiaomi
+      - pixel
+      - oppo
+      - vivo
+      - realme
+      - motorola
+      - lg
+      - sony xperia
+      - nexus
+      - htc
+
+  # --- MICROSOFT ---
+  - synonym: PC
+    examples: |
+      - microsoft windows
+      - windows os
+      - windows
+      - pc
+      - personal computer
+      - desktop
+      - laptop
+      - win10
+      - win11
+      - steam  # Added this (users often say "is it on Steam" meaning PC)
+      - epic games store
+
+  - synonym: Xbox Series X
+    examples: |
+      - xbox series x
+      - xbox series s # Added Series S (same gen)
+      - series x
+      - series s
+      - xsx
+      - xss
+      - current xbox
+      - xbox # Risky, but acceptable for modern contexts
+
+  - synonym: Xbox One
+    examples: |
+      - xboxone
+      - xbox one console
+      - xbone
+      - old xbox
+
+  - synonym: Xbox 360
+    examples: |
+      - xbox360
+      - 360
+
+  # --- SONY ---
+  - synonym: PS5
+    examples: |
+      - playstation 5
+      - ps5
+      - sony playstation 5
+      - ps 5
+      - current playstation
+      - next gen playstation
+
+  - synonym: PS4
+    examples: |
+      - playstation 4
+      - ps4
+      - sony playstation 4
+      - ps 4
+
+  - synonym: PS3
+    examples: |
+      - playstation 3
+      - ps3
+      - ps 3
+
+  - synonym: PS2
+    examples: |
+      - playstation 2
+      - ps2
+      - ps 2
+
+  - synonym: PS1
+    examples: |
+      - playstation 1
+      - ps1
+      - psone
+      - ps 1
+      - psx
+      - original playstation
+
+  # --- NINTENDO ---
+  - synonym: Nintendo Switch 2
+    examples: |
+      - switch 2
+      - switch pro
+      - nintendo switch pro
+      - ns2
+      - new switch
+      - next gen switch
+
+  - synonym: Nintendo Switch
+    examples: |
+      - switch
+      - the switch
+      - nintendo switch
+      - switch 1
+      - og switch
+      - switch oled
+      - switch lite
+      - ns
+
+  - synonym: Nintendo Wii
+    examples: |
+      - wii
+      - the wii
+
+  - synonym: Nintendo DS
+    examples: |
+      - ds
+      - nds
+      - dual screen
+
+  - synonym: Nintendo 3DS
+    examples: |
+      - 3ds
+      - three ds
+
+  # --- COMPUTER ---
+  - synonym: MacOS
+    examples: |
+      - mac os
+      - macintosh
+      - apple mac
+      - macbook
+      - macbook pro
+      - macbook air
+      - imac
+      - mac mini
+      - mac
+  
+  - synonym: Linux
+    examples: |
+      - ubuntu
+      - debian
+      - fedora
+      - centos
+      - red hat
+      - arch
+      - manjaro
+      - mint
+      - kali
+      - steam deck
+      - steamos
+
+  - regex: game_title_with_numbers
+    examples: |
+      - \b[A-Z][a-zA-Z\s:'-]*\d+\b
+      - \bGTA\s*[IVX0-9]+\b
+      - \b[A-Z]{2,}\s*\d+\b
+
+  - regex: game_sequel_pattern
+    examples: |
+      - \b\w+\s*(2|3|4|5|II|III|IV|V|VI)\b
+      - \b\w+:\s*[A-Z][a-z]+\b
+
+
