@@ -56,7 +56,7 @@ rules:
   steps:
   - intent: search_game
   - action: game_search_form
-  - active_loop: null
+  - active_loop: game_search_form
 
 - rule: Submit game search form
   condition:
@@ -91,6 +91,16 @@ rules:
   steps:
   - intent: deny
   - action: utter_deny_details
+
+- rule: Search DLCs for a game
+  steps:
+  - intent: fetch_dlcs_and_editions
+  - action: action_game_dlc
+
+- rule: Fetch game series
+  steps:
+  - intent: fetch_game_series
+  - action: action_fetch_game_series
 
 # =========================================================================
 # FORM INTERRUPTIONS (Crucial Logic)

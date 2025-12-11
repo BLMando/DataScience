@@ -335,3 +335,214 @@ class ActionGameDetails(Action):
             print(f"Error: {e}")
             dispatcher.utter_message(text="💥 Critical Hit! Something went wrong. Please try again.")
             return [SlotSet("game_id", None), SlotSet("game_title", None)]
+
+class ActionGameDLC(Action):
+    def name(self) -> Text:
+        return "action_game_dlc"
+
+    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        game_id = tracker.get_slot("game_id")
+        game_title = tracker.get_slot("game_title")
+
+        # If no game_id, but game_title exists, search for ID
+        if not game_id:
+            if game_title:
+                dispatcher.utter_message(text=f"🔍 Consulting the archives for {game_title}...")
+
+                search_params = {
+                    "key": API_KEY, 
+                    "search": game_title, 
+                    "page_size": 1
+                }
+
+                try:
+                    search_response = requests.get(f"{BASE_URL}/games", params=search_params)
+                    search_response.raise_for_status()
+                    results = search_response.json().get("results", [])
+
+                    if results:
+                        game_id = results[0].get("id")
+                    else:
+                        dispatcher.utter_message(text=f"Couldn't find the game '{game_title}', so no DLC info is available.")
+                        return [SlotSet("game_id", None), SlotSet("game_title", None)]
+                except Exception as e:
+                    print(f"❌ Error searching for game ID: {e}")
+                    dispatcher.utter_message(text="💥 Something went wrong while searching for the game. Please try again.")
+                    return [SlotSet("game_id", None), SlotSet("game_title", None)]
+            else:
+                dispatcher.utter_message(text="🤷‍♂️ I need a game first! Please search for one by title.")
+                return []
+        
+        params = {
+            "key": API_KEY,
+            "page_size": 10   
+        }
+
+        # Now fetch DLCs using the game_id
+        try:
+            response = requests.get(f"{BASE_URL}/games/{game_id}/additions", params=params)
+            response.raise_for_status()
+            dlcs = response.json().get("results", [])
+
+            if not dlcs:
+                dispatcher.utter_message(text=f"No DLCs or editions found for this game.")
+                return []
+
+            message = f"DLCs and editions for {game_title}:\n"
+            for dlc in dlcs:
+                name = dlc.get("name")
+                released = dlc.get("released", "N/A")
+                message += f"• {name} (Released: {released})\n"
+
+            dispatcher.utter_message(text=message)
+            return [SlotSet("game_id", None), SlotSet("game_title", None)]
+
+        except requests.exceptions.RequestException as e:
+            print(f"❌ Error fetching DLCs: {e}")
+            dispatcher.utter_message(text="💥 Something went wrong while fetching DLCs. Please try again later.")
+            return [SlotSet("game_id", None), SlotSet("game_title", None)]
+
+class ActionFetchGameSeries(Action):
+    """Fetch related games belonging to the same series"""
+
+    def name(self) -> Text:
+        return "action_fetch_game_series"
+    
+    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        game_id = tracker.get_slot("game_id")
+        game_title = tracker.get_slot("game_title")
+
+        # If no game_id, but game_title exists, search for ID
+        if not game_id:
+            if game_title:
+                dispatcher.utter_message(text=f"🔍 Consulting the archives for {game_title}...")
+
+                search_params = {
+                    "key": API_KEY, 
+                    "search": game_title, 
+                    "page_size": 1
+                }
+
+                try:
+                    search_response = requests.get(f"{BASE_URL}/games", params=search_params)
+                    search_response.raise_for_status()
+                    results = search_response.json().get("results", [])
+
+                    if results:
+                        game_id = results[0].get("id")
+                    else:
+                        dispatcher.utter_message(text=f"Couldn't find the game '{game_title}', so no info is available.")
+                        return [SlotSet("game_id", None), SlotSet("game_title", None)]
+                except Exception as e:
+                    print(f"❌ Error searching for game ID: {e}")
+                    dispatcher.utter_message(text="💥 Something went wrong while searching for the game. Please try again.")
+                    return [SlotSet("game_id", None), SlotSet("game_title", None)]
+            else:
+                dispatcher.utter_message(text="🤷‍♂️ I need a game first! Please search for one by title.")
+                return []
+        
+        params = {
+            "key": API_KEY,
+            "page_size": 10   
+        }
+
+        
+        try:
+            response = requests.get(f"{BASE_URL}/games/{game_id}/game-series", params=params)
+            response.raise_for_status()
+            results = response.json().get("results", [])
+
+            if not results:
+                dispatcher.utter_message(text=f"There aren't any related games in the series for this title.")
+                return []
+
+            message = f"Related games in the series for {game_title}:\n"
+            for g in results:
+                name = g.get("name")
+                released = g.get("released", "N/A")
+                rating = g.get("rating", "N/A")
+                message += f"• {name} (Release: {released}, Rating: {rating})\n"
+
+            dispatcher.utter_message(text=message)
+            return [SlotSet("game_id", None), SlotSet("game_title", None)]
+
+        except requests.exceptions.RequestException as e:
+            print(f"❌ Internal error while retrieving the series: {e}")
+            dispatcher.utter_message(text="💥 Internal error while retrieving the series. Please try again later.")
+            return [SlotSet("game_id", None), SlotSet("game_title", None)]
+
+class ActionGameStores(Action):
+    """Fetch stores where the game can be purchased"""
+
+    def name(self) -> Text:
+        return "action_game_stores"
+    
+    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        game_id = tracker.get_slot("game_id")
+        game_title = tracker.get_slot("game_title")
+
+        if not game_id:
+            if game_title:
+                dispatcher.utter_message(text=f"🔍 Consulting the archives for {game_title}...")
+
+                search_params = {
+                    "key": API_KEY, 
+                    "search": game_title, 
+                    "page_size": 1
+                }
+
+                try:
+                    search_response = requests.get(f"{BASE_URL}/games", params=search_params)
+                    search_response.raise_for_status()
+                    results = search_response.json().get("results", [])
+
+                    if results:
+                        game_id = results[0].get("id")
+                    else:
+                        dispatcher.utter_message(text=f"Couldn't find the game '{game_title}', so no info is available.")
+                        return [SlotSet("game_id", None), SlotSet("game_title", None)]
+                except Exception as e:
+                    print(f"❌ Error searching for game ID: {e}")
+                    dispatcher.utter_message(text="💥 Something went wrong while searching for the game. Please try again.")
+                    return [SlotSet("game_id", None), SlotSet("game_title", None)]
+        else:
+            dispatcher.utter_message(text="🤷‍♂️ I need a game first! Please search for one by title.")
+            return []
+            
+        params = {
+            "key": API_KEY,
+            "page_size": 10   
+        }
+
+        try:
+            stores_response = requests.get(f"{BASE_URL}/games/{game_id}/stores", params=params)
+            stores_response.raise_for_status()
+            results = stores_response.json().get("results", [])
+
+            if not results:
+                dispatcher.utter_message(text=f"No store information found for this game.")
+                return [SlotSet("game_id", None), SlotSet("game_title", None)]
+            
+            
+            message = f"Stores where you can buy the {game_title}:\n"
+            for g in results:
+                store_data = g.get("store", {})
+                store_name = store_data.get("name")
+                store_url = g.get("url")
+                message += f"• {store_url}\n"
+
+            dispatcher.utter_message(text=message)
+            return [SlotSet("game_id", None), SlotSet("game_title", None)]
+
+        except requests.exceptions.RequestException as e:
+            print(f"❌ Internal error while retrieving the stores: {e}")
+            dispatcher.utter_message(text="💥 Internal error while retrieving the stores. Please try again later.")
+            return [SlotSet("game_id", None), SlotSet("game_title", None)]
+            
+           
+
+
+                    
+
+
+
