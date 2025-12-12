@@ -51,11 +51,11 @@ rules:
   # GAME SEARCH FORM (Happy Paths)
   # =========================================================================
 
-  - rule: Activate game search form
-    steps:
-      - intent: search_game
-      - action: game_search_form
-      - active_loop: null
+- rule: Activate game search form
+  steps:
+  - intent: search_game
+  - action: game_search_form
+  - active_loop: game_search_form
 
   - rule: Submit game search form
     condition:
@@ -91,9 +91,19 @@ rules:
       - intent: deny
       - action: utter_deny_details
 
-  # =========================================================================
-  # FORM INTERRUPTIONS (Crucial Logic)
-  # =========================================================================
+- rule: Search DLCs for a game
+  steps:
+  - intent: fetch_dlcs_and_editions
+  - action: action_game_dlc
+
+- rule: Fetch game series
+  steps:
+  - intent: fetch_game_series
+  - action: action_fetch_game_series
+
+# =========================================================================
+# FORM INTERRUPTIONS (Crucial Logic)
+# =========================================================================
 
   # 1. HARD EXIT: User wants to search specific name, ignoring form questions.
   # FIX: Removed the conflicting "Resume Form" rule for this intent.
