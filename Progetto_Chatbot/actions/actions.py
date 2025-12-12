@@ -599,11 +599,13 @@ class ActionCheckCompatibility(Action):
 
             # Try to find the platform entry
             matched_platform_entry = None
+            plat_list = []
             for p in platforms:
                 plat_obj = p.get("platform", {})
                 plat_name = (plat_obj.get("name") or "").lower()
                 plat_slug = (plat_obj.get("slug") or "").lower()
                 plat_id = plat_obj.get("id")
+                plat_list.append(plat_name)
 
                 # Match by id if utils returned a numeric id
                 if isinstance(mapped_platform, int) or (isinstance(mapped_platform, str) and mapped_platform.isdigit()):
@@ -629,30 +631,62 @@ class ActionCheckCompatibility(Action):
 
             if matched_platform_entry:
                 plat_obj = matched_platform_entry.get("platform", {})
-                # Extract and present platform details (safe format)
                 plat_name = plat_obj.get("name")
                 plat_slug = plat_obj.get("slug")
-                plat_year_start = plat_obj.get("year_start", "N/A")
-                plat_year_end = plat_obj.get("year_end", "N/A")
                 plat_requirements = matched_platform_entry.get("requirements", {}) or plat_obj.get("requirements_en", {}) or matched_platform_entry.get("requirements_en")
 
-                platform_details_lines = [
-                    f"🎮 Game: {details.get('name')}",
-                    f"🖥️ Platform: {plat_name} ({plat_slug})",
-                    f"🆔 Platform ID: {plat_obj.get('id')}",
-                    f"📅 Supported years: {plat_year_start} - {plat_year_end}"
+                game_name = details.get('name')
+                plat_list_formatted = [a.capitalize() for a in plat_list]
+                platforms_str = ', '.join(plat_list_formatted)
+
+                # Prepare initial lines for length calculation
+                temp_lines = [
+                    f"🎮 Game: {game_name}",
+                    f"🖥️ Platforms: {platforms_str}"
                 ]
 
                 if plat_requirements:
-                    # requirements might be a dict or string
                     if isinstance(plat_requirements, dict):
-                        req_text = "; ".join([f"{k}: {v}" for k, v in plat_requirements.items() if v])
+                        # Format requirements into multiple lines
+                        req_lines = [f"  - {k.capitalize()}: {v}" for k, v in plat_requirements.items() if v]
+                        temp_lines.append("⚙️ Requirements:")
+                        temp_lines.extend(req_lines)
                     else:
-                        req_text = str(plat_requirements)
-                    platform_details_lines.append(f"⚙️ Requirements: {req_text}")
+                        temp_lines.append(f"⚙️ Requirements: {str(plat_requirements)}")
+
+                # Calculate max content length for dynamic box width
+                max_content_length = max(len(line) for line in temp_lines)
+                
+                # Determine box width, ensuring title and padding fit
+                title_text = "🎮 Game Details 🎮"
+                box_width = max(max_content_length + 4, len(title_text) + 4) # +4 for padding
+
+                header = "╔" + "═" * (box_width - 2) + "╗"
+                # Center the title text
+                title_padding = box_width - len(title_text) - 2 # total padding needed, excluding '║'
+                title_left_padding = title_padding // 2
+                title_right_padding = title_padding - title_left_padding
+                title_line = "║" + " " * title_left_padding + title_text + " " * title_right_padding + "║"
+                
+                divider = "╠" + "═" * (box_width - 2) + "╣"
+                mid_divider = "╟" + "─" * (box_width - 2) + "╢"
+                footer = "╚" + "═" * (box_width - 2) + "╝"
+
+                final_platform_details_lines = [header, title_line, divider]
+
+                # Add game and platforms
+                final_platform_details_lines.append("║ " + temp_lines[0].ljust(box_width - 4) + " ║")
+                final_platform_details_lines.append("║ " + temp_lines[1].ljust(box_width - 4) + " ║")
+
+                if plat_requirements:
+                    final_platform_details_lines.append(mid_divider) # Add mid-divider before requirements
+                    for i in range(2, len(temp_lines)): # Iterate from the third element (requirements)
+                        final_platform_details_lines.append("║ " + temp_lines[i].ljust(box_width - 4) + " ║")
+
+                final_platform_details_lines.append(footer)
 
                 dispatcher.utter_message(text="✅ Good news! This game is available on that platform.")
-                dispatcher.utter_message(text="\n".join(platform_details_lines))
+                dispatcher.utter_message(text="\n".join(final_platform_details_lines))
                 return [SlotSet("game_id", None), SlotSet("game_title", None), SlotSet("platform", None)]
             else:
                 dispatcher.utter_message(text=f"❌ Unfortunately, '{details.get('name')}' is not available on {platform_slot}.")
@@ -669,8 +703,6 @@ class ActionCheckCompatibility(Action):
             dispatcher.utter_message(text="💥 Something went wrong while checking compatibility. Please try again later.")
             return [SlotSet("game_id", None), SlotSet("game_title", None)]
 
-
-                    
 
 
 
