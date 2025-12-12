@@ -9,7 +9,6 @@ rules:
     steps:
       - intent: goodbye
       - action: utter_goodbye
-      # CRITICAL FIX: Explicitly kill any active loop if they say goodbye
       - active_loop: null
 
   - rule: Respond to greeting
@@ -43,7 +42,6 @@ rules:
 
   - rule: Handle core fallback
     steps:
-      # Ensure RulePolicy in config.yml is pointing to this action
       - action: action_my_fallback
       - action: action_listen
 
@@ -51,11 +49,11 @@ rules:
   # GAME SEARCH FORM (Happy Paths)
   # =========================================================================
 
-- rule: Activate game search form
-  steps:
-  - intent: search_game
-  - action: game_search_form
-  - active_loop: game_search_form
+  - rule: Activate game search form
+    steps:
+      - intent: search_game
+      - action: game_search_form
+      - active_loop: game_search_form
 
   - rule: Submit game search form
     condition:
@@ -63,10 +61,28 @@ rules:
     steps:
       - action: game_search_form
       - active_loop: null
-      - slot_was_set:
-          - requested_slot: null
       - action: utter_submit_game_search_form
       - action: action_recommend_games
+
+  # ========================================================================
+  # COMPATIBILITY CHECK
+  # ========================================================================
+  - rule: Check compatibility for game (no form active)
+    condition:
+      - active_loop: null
+    steps:
+      - intent: check_compatibility_with_platform
+      - action: action_check_compatibility
+      - action: action_listen
+
+  - rule: Check compatibility for game (interrupts the game_search_form and resumes)
+    condition:
+      - active_loop: game_search_form
+    steps:
+      - intent: check_compatibility_with_platform
+      - action: action_check_compatibility
+      - action: game_search_form
+      - active_loop: game_search_form
 
   # =========================================================================
   # ONE-OFF SEARCH & DETAILS (No Form)
@@ -91,31 +107,28 @@ rules:
       - intent: deny
       - action: utter_deny_details
 
-- rule: Search DLCs for a game
-  steps:
-  - intent: fetch_dlcs_and_editions
-  - action: action_game_dlc
+  - rule: Search DLCs for a game
+    steps:
+      - intent: fetch_dlcs_and_editions
+      - action: action_game_dlc
 
-- rule: Fetch game series
-  steps:
-  - intent: fetch_game_series
-  - action: action_fetch_game_series
+  - rule: Fetch game series
+    steps:
+      - intent: fetch_game_series
+      - action: action_fetch_game_series
 
-# =========================================================================
-# FORM INTERRUPTIONS (Crucial Logic)
-# =========================================================================
+  # =========================================================================
+  # FORM INTERRUPTIONS (Crucial Logic)
+  # =========================================================================
 
-  # 1. HARD EXIT: User wants to search specific name, ignoring form questions.
-  # FIX: Removed the conflicting "Resume Form" rule for this intent.
   - rule: Direct game search by name (interrupts and kills form)
     condition:
       - active_loop: game_search_form
     steps:
       - intent: search_game_by_name
-      - active_loop: null # Kills the form
+      - active_loop: null
       - action: action_search_game_by_name
 
-  # 2. TEMPORARY INTERRUPTIONS: Chit-chat, then return to form.
   - rule: Form Interruption - Bot Challenge
     condition:
       - active_loop: game_search_form
@@ -143,11 +156,22 @@ rules:
       - action: game_search_form
       - active_loop: game_search_form
 
-  # 3. IGNORE: Handling skip outside form (Good to keep)
   - rule: Handle Skip outside form
     condition:
       - active_loop: null
     steps:
       - intent: skip
       - action: utter_fallback
+
+  # =========================================================================
+  # INFORMAL UTTERANCES AND FALLBACKS EXPECTED BY ACTIONS
+  # =========================================================================
+
+
+  - rule: Ask to show details after recommendations
+    steps:
+      - action: action_recommend_games
+      - action: utter_ask_game_details
+
+
 

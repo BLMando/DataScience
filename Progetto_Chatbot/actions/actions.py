@@ -539,7 +539,135 @@ class ActionGameStores(Action):
             dispatcher.utter_message(text="💥 Internal error while retrieving the stores. Please try again later.")
             return [SlotSet("game_id", None), SlotSet("game_title", None)]
             
-           
+
+class ActionCheckCompatibility(Action):
+    """Check whether a specified game is available on a given platform."""
+
+    def name(self) -> Text:
+        return "action_check_compatibility"
+
+    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        # Get fresh entities if present (prioritize entities over slots)
+        entities = tracker.latest_message.get("entities", [])
+        game_title_entity = next((e for e in entities if e["entity"] == "game_title"), None)
+        platform_entity = next((e for e in entities if e["entity"] == "platform"), None)
+
+        game_title = game_title_entity["value"] if game_title_entity else tracker.get_slot("game_title")
+        platform_slot = platform_entity["value"] if platform_entity else tracker.get_slot("platform")
+
+        if not game_title:
+            dispatcher.utter_message(response="utter_ask_game_name")
+            return [SlotSet("game_title", None)]
+
+        if not platform_slot or platform_slot in ["skip", "skipped", "any", "none"]:
+            dispatcher.utter_message(text="Which platform would you like me to check? (PC, PS5, Xbox, Switch, …) or type 'skip' to ignore.")
+            return [SlotSet("platform", None)]
+
+        dispatcher.utter_message(text=f"🔎 Checking if '{game_title}' is available on {platform_slot}...")
+
+        # Normalize platform
+        normalized_platform = platform_slot.lower().strip()
+        mapped_platform = get_platform_id(normalized_platform)  # might return id or slug depending on utils
+
+        # Search for the game to get id
+        search_params = {"key": API_KEY, "search": game_title, "page_size": 1}
+        try:
+            search_resp = requests.get(f"{BASE_URL}/games", params=search_params)
+            search_resp.raise_for_status()
+            results = search_resp.json().get("results", [])
+            if not results:
+                dispatcher.utter_message(response="utter_game_not_found")
+                return [SlotSet("game_title", None)]
+            game = results[0]
+            game_id = game.get("id")
+        except Exception as e:
+            print(f"❌ Error searching for game: {e}")
+            dispatcher.utter_message(text="💥 Something went wrong while searching the games. Please try again.")
+            return [SlotSet("game_title", None)]
+
+        # Get game details
+        try:
+            resp = requests.get(f"{BASE_URL}/games/{game_id}", params={"key": API_KEY})
+            resp.raise_for_status()
+            details = resp.json()
+
+            platforms = details.get("platforms", [])  # list of {'platform': {...}, 'released_at':..., 'requirements'...}
+
+            if not platforms:
+                dispatcher.utter_message(text=f"I couldn't find platform data for '{game_title}'.")
+                return [SlotSet("game_title", None), SlotSet("game_id", None)]
+
+            # Try to find the platform entry
+            matched_platform_entry = None
+            for p in platforms:
+                plat_obj = p.get("platform", {})
+                plat_name = (plat_obj.get("name") or "").lower()
+                plat_slug = (plat_obj.get("slug") or "").lower()
+                plat_id = plat_obj.get("id")
+
+                # Match by id if utils returned a numeric id
+                if isinstance(mapped_platform, int) or (isinstance(mapped_platform, str) and mapped_platform.isdigit()):
+                    try:
+                        if plat_id and int(mapped_platform) == int(plat_id):
+                            matched_platform_entry = p
+                            break
+                    except Exception:
+                        pass
+
+                # Match by slug or name exactly
+                if mapped_platform and isinstance(mapped_platform, str):
+                    if mapped_platform.lower() == plat_slug or mapped_platform.lower() == plat_name:
+                        matched_platform_entry = p
+                        break
+
+                # Fuzzy match fallback
+                ratio_name = SequenceMatcher(None, normalized_platform, plat_name).ratio() if plat_name else 0
+                ratio_slug = SequenceMatcher(None, normalized_platform, plat_slug).ratio() if plat_slug else 0
+                if max(ratio_name, ratio_slug) >= 0.8:
+                    matched_platform_entry = p
+                    break
+
+            if matched_platform_entry:
+                plat_obj = matched_platform_entry.get("platform", {})
+                # Extract and present platform details (safe format)
+                plat_name = plat_obj.get("name")
+                plat_slug = plat_obj.get("slug")
+                plat_year_start = plat_obj.get("year_start", "N/A")
+                plat_year_end = plat_obj.get("year_end", "N/A")
+                plat_requirements = matched_platform_entry.get("requirements", {}) or plat_obj.get("requirements_en", {}) or matched_platform_entry.get("requirements_en")
+
+                platform_details_lines = [
+                    f"🎮 Game: {details.get('name')}",
+                    f"🖥️ Platform: {plat_name} ({plat_slug})",
+                    f"🆔 Platform ID: {plat_obj.get('id')}",
+                    f"📅 Supported years: {plat_year_start} - {plat_year_end}"
+                ]
+
+                if plat_requirements:
+                    # requirements might be a dict or string
+                    if isinstance(plat_requirements, dict):
+                        req_text = "; ".join([f"{k}: {v}" for k, v in plat_requirements.items() if v])
+                    else:
+                        req_text = str(plat_requirements)
+                    platform_details_lines.append(f"⚙️ Requirements: {req_text}")
+
+                dispatcher.utter_message(text="✅ Good news! This game is available on that platform.")
+                dispatcher.utter_message(text="\n".join(platform_details_lines))
+                return [SlotSet("game_id", None), SlotSet("game_title", None), SlotSet("platform", None)]
+            else:
+                dispatcher.utter_message(text=f"❌ Unfortunately, '{details.get('name')}' is not available on {platform_slot}.")
+                return [SlotSet("game_id", None), SlotSet("game_title", None)]
+
+        except requests.exceptions.HTTPError as e:
+            if e.response.status_code == 404:
+                dispatcher.utter_message(text=f"❌ Game with ID '{game_id}' not found.")
+            else:
+                dispatcher.utter_message(text="👾 I couldn't fetch the game details. Please try again later.")
+            return [SlotSet("game_id", None), SlotSet("game_title", None)]
+        except Exception as e:
+            print(f"❌ Error checking compatibility: {e}")
+            dispatcher.utter_message(text="💥 Something went wrong while checking compatibility. Please try again later.")
+            return [SlotSet("game_id", None), SlotSet("game_title", None)]
 
 
                     

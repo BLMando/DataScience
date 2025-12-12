@@ -77,4 +77,94 @@ stories:
       entities:
         - game_title: "Halo Infinite"
     - action: action_game_stores
-    
+
+- story: Check compatibility - happy path (entities)
+  steps:
+  - intent: check_compatibility_with_platform
+    entities:
+      - game_title: "The Witcher 3"
+      - platform: "PC"
+  - action: action_check_compatibility
+  - slot_was_set:
+    - game_id: null
+    - game_title: null
+    - platform: null
+
+- story: Check compatibility - missing platform (user supplies later)
+  steps:
+  - intent: check_compatibility_with_platform
+    entities:
+      - game_title: "Hades"
+  - action: action_check_compatibility
+  - action: action_listen
+  - intent: inform
+    entities:
+      - platform: "Switch"
+  - action: action_check_compatibility
+  - slot_was_set:
+    - game_id: null
+    - game_title: null
+    - platform: null
+
+- story: Check compatibility - missing game title (user supplies later)
+  steps:
+  - intent: check_compatibility_with_platform
+    entities:
+      - platform: "PC"
+  - action: action_check_compatibility
+  - action: action_listen
+  - intent: inform
+    entities:
+      - game_title: "Stardew Valley"
+  - action: action_check_compatibility
+  - slot_was_set:
+    - game_id: null
+    - game_title: null
+    - platform: null
+
+- story: Check compatibility - using pre-set slots
+  steps:
+  - slot_was_set:
+    - game_title: "Sekiro"
+    - platform: "PS5"
+  - intent: check_compatibility_with_platform
+  - action: action_check_compatibility
+  - slot_was_set:
+    - game_id: null
+    - game_title: null
+    - platform: null
+
+- story: Check compatibility - not available on platform
+  steps:
+  - intent: check_compatibility_with_platform
+    entities:
+      - game_title: "FIFA 21"
+      - platform: "Switch"
+  - action: action_check_compatibility
+  - slot_was_set:
+    - game_id: null
+    - game_title: null
+    - platform: null
+
+- story: Check compatibility - interrupts the form and resumes
+  steps:
+  - intent: search_game
+  - action: game_search_form
+  - active_loop: game_search_form
+  - intent: check_compatibility_with_platform
+    entities:
+      - game_title: "Elden Ring"
+      - platform: "PC"
+  - action: action_check_compatibility
+  - action: game_search_form
+  - active_loop: game_search_form
+
+- story: Confirm showing details (use affirm)
+  steps:
+  - intent: search_game_by_name
+  - slot_was_set:
+    - game_title: "The Witcher 3"
+  - action: action_search_game_by_name
+  - intent: affirm
+  - action: action_game_details
+

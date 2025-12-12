@@ -15,7 +15,7 @@ intents:
   - fetch_game_stores
   - inform
   - skip
-
+  - check_compatibility_with_platform   # <-- added to resolve warnings
 
 entities:
   - game_title
@@ -155,6 +155,7 @@ actions:
   - action_game_dlc
   - action_fetch_game_series
   - action_game_stores
+  - action_check_compatibility          # <-- added to resolve warnings
 
 config:
   store_entities_as_slots: true
