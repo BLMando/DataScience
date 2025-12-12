@@ -56,3 +56,25 @@ stories:
   - intent: game_details
   - action: action_game_details
 
+
+- story: User asks for DLCs after searching for a game
+  steps:
+  - intent: fetch_dlcs_and_editions
+  - slot_was_set:
+    - game_title: "Cyberpunk 2077"
+  - action: action_game_dlc
+
+- story: User requests game series
+  steps:
+    - intent: fetch_game_series
+      entities:
+        - game_title: "Elden Ring"
+    - action: action_fetch_game_series
+
+- story: User requests game stores
+  steps:
+    - intent: fetch_game_stores
+      entities:
+        - game_title: "Halo Infinite"
+    - action: action_game_stores
+    

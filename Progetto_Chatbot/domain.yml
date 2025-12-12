@@ -10,6 +10,9 @@ intents:
   - search_game
   - search_game_by_name
   - game_details
+  - fetch_dlcs_and_editions
+  - fetch_game_series
+  - fetch_game_stores
   - inform
   - skip
 
@@ -142,12 +145,16 @@ responses:
   utter_ask_game_name:
     - text: "Sure! What is the name of the game you are looking for? 🕵️‍♂️"
 
+
 actions:
   - action_search_game_by_name
   - action_recommend_games
   - action_game_details
   - action_my_fallback
   - validate_game_search_form
+  - action_game_dlc
+  - action_fetch_game_series
+  - action_game_stores
 
 config:
   store_entities_as_slots: true

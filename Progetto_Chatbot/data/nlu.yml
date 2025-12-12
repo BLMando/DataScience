@@ -345,6 +345,60 @@ nlu:
       - Do you knwo that [Splitgate 2](game_title) is available on [Xbox Series X](platform)?
       - Does [Halo](game_title) run on [Xbox One](platform)?
 
+
+  # ============================================================================
+  # DLCs AND EDITIONS
+  # ============================================================================
+
+  - intent: fetch_dlcs_and_editions
+    examples: |
+      - Does [Elden Ring](game_title) have any DLCs?
+      - What DLCs are available for [The Witcher 3](game_title)?
+      - Are there any expansions for [Cyberpunk 2077](game_title)?
+      - Show me the DLCs for [Red Dead Redemption 2](game_title)
+      - List the editions of [God of War](game_title)
+      - Are there special editions of [Horizon Forbidden West](game_title)?
+      - What downloadable content exists for [Minecraft](game_title)?
+      - any dlcs for [the legend of zelda: breath of the wild](game_title)?
+      - show me the dlcs for [final fantasy xvi](game_title)
+      - are there expansions for [call of duty: modern warfare ii](game_title)?
+      - list the editions of [assassin's creed valhalla](game_title)
+      - are there special editions of [resident evil 4](game_title)?
+
+  # ============================================================================
+  # GAME SERIES
+  # ============================================================================
+
+  - intent: fetch_game_series
+    examples: |
+      - Is [Assassin's Creed Valhalla](game_title) part of a series?
+      - What series does [The Witcher 3](game_title) belong to?
+      - Are there other games in the [Halo](game_title) series?
+      - Show me the series for [Final Fantasy VII Remake](game_title)
+      - List the games in the [God of War](game_title) series
+      - Is [Call of Duty: Modern Warfare II](game_title) a sequel?
+      - any series info for [Dark Souls III](game_title)?
+      - show me the series for [super mario bros. wonder](game_title)
+      - are there other games in the [the elder scrolls v: skyrim](game_title) series?
+      - list the games in the [grand theft auto v](game_title) series?
+
+  # ============================================================================
+  # GAME STORES
+  # ============================================================================
+
+  - intent: fetch_game_stores
+    examples: |
+      - Where can I buy [Cyberpunk 2077](game_title)?
+      - What stores sell [The Witcher 3](game_title)?
+      - Is [God of War](game_title) available on Steam?
+      - Show me the stores for [Red Dead Redemption 2](game_title)
+      - List the platforms where I can get [Horizon Forbidden West](game_title)
+      - Can I find [Minecraft](game_title) on Epic Games Store?
+      - where can i buy [elden ring](game_title)?
+      - what stores sell [final fantasy vii remake](game_title)?
+      - is [super smash bros. ultimate](game_title) available on nintendo eshop?
+      - list the platforms where i can get [apex legends](game_title)
+
   # ============================================================================
   # LOOKUP TABLES
   # ============================================================================
