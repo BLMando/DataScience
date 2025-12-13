@@ -345,6 +345,20 @@ nlu:
       - Do you knwo that [Splitgate 2](game_title) is available on [Xbox Series X](platform)?
       - Does [Halo](game_title) run on [Xbox One](platform)?
 
+  - intent: check_platform_requirements
+    examples: |
+      - What are the requirements for [Minecraft](game_title) on [PC](platform)?
+      - What are the [PC](platform) requirements for [Cyberpunk 2077](game_title)?
+      - Can my [PC](platform) run [The Witcher 3](game_title)?
+      - What do I need to run [Elden Ring](game_title) on [PC](platform)?
+      - [PC](platform) requirements for [Baldur's Gate 3](game_title)
+      - Tell me the specs for [Starfield](game_title) on [PC](platform)
+      - What are the minimum requirements for [Alan Wake 2](game_title) on [PC](platform)?
+      - Recommended specs for [Helldivers 2](game_title) on [PC](platform)
+      - System requirements for [Palworld](game_title)
+      - requirements for [Final Fantasy VII Remake](game_title) on [PS5](platform)
+      - What are the storage requirements for [Hogwarts Legacy](game_title) on [Xbox Series X](platform)?
+
 
   # ============================================================================
   # DLCs AND EDITIONS

@@ -1,3 +1,4 @@
+import re
 from typing import Any, Text, Dict, List
 from rasa_sdk import Action, Tracker, FormValidationAction
 from rasa_sdk.executor import CollectingDispatcher
@@ -602,7 +603,7 @@ class ActionCheckCompatibility(Action):
             plat_list = []
             for p in platforms:
                 plat_obj = p.get("platform", {})
-                plat_name = (plat_obj.get("name") or "").lower()
+                plat_name = (plat_obj.get("name") or "")
                 plat_slug = (plat_obj.get("slug") or "").lower()
                 plat_id = plat_obj.get("id")
                 plat_list.append(plat_name)
@@ -634,59 +635,24 @@ class ActionCheckCompatibility(Action):
                 plat_name = plat_obj.get("name")
                 plat_slug = plat_obj.get("slug")
                 plat_requirements = matched_platform_entry.get("requirements", {}) or plat_obj.get("requirements_en", {}) or matched_platform_entry.get("requirements_en")
-
-                game_name = details.get('name')
-                plat_list_formatted = [a.capitalize() for a in plat_list]
-                platforms_str = ', '.join(plat_list_formatted)
-
-                # Prepare initial lines for length calculation
-                temp_lines = [
-                    f"🎮 Game: {game_name}",
-                    f"🖥️ Platforms: {platforms_str}"
+                '\n'.join([ a.capitalize() for a in plat_list])
+                platform_details_lines = [
+                    f"🎮 Game: {details.get('name')}",
+                    f"🖥️ Platforms:\n" + "\n".join([
+                        f"▶️ {p.upper()}" if p.lower() == platform_slot.lower() else f" - {p}"
+                        for p in plat_list
+                    ])
                 ]
 
                 if plat_requirements:
+                    # requirements might be a dict or string
                     if isinstance(plat_requirements, dict):
-                        # Format requirements into multiple lines
-                        req_lines = [f"  - {k.capitalize()}: {v}" for k, v in plat_requirements.items() if v]
-                        temp_lines.append("⚙️ Requirements:")
-                        temp_lines.extend(req_lines)
+                        req_text = "; ".join([f"{k}: {v}" for k, v in plat_requirements.items() if v])
                     else:
-                        temp_lines.append(f"⚙️ Requirements: {str(plat_requirements)}")
-
-                # Calculate max content length for dynamic box width
-                max_content_length = max(len(line) for line in temp_lines)
-                
-                # Determine box width, ensuring title and padding fit
-                title_text = "🎮 Game Details 🎮"
-                box_width = max(max_content_length + 4, len(title_text) + 4) # +4 for padding
-
-                header = "╔" + "═" * (box_width - 2) + "╗"
-                # Center the title text
-                title_padding = box_width - len(title_text) - 2 # total padding needed, excluding '║'
-                title_left_padding = title_padding // 2
-                title_right_padding = title_padding - title_left_padding
-                title_line = "║" + " " * title_left_padding + title_text + " " * title_right_padding + "║"
-                
-                divider = "╠" + "═" * (box_width - 2) + "╣"
-                mid_divider = "╟" + "─" * (box_width - 2) + "╢"
-                footer = "╚" + "═" * (box_width - 2) + "╝"
-
-                final_platform_details_lines = [header, title_line, divider]
-
-                # Add game and platforms
-                final_platform_details_lines.append("║ " + temp_lines[0].ljust(box_width - 4) + " ║")
-                final_platform_details_lines.append("║ " + temp_lines[1].ljust(box_width - 4) + " ║")
-
-                if plat_requirements:
-                    final_platform_details_lines.append(mid_divider) # Add mid-divider before requirements
-                    for i in range(2, len(temp_lines)): # Iterate from the third element (requirements)
-                        final_platform_details_lines.append("║ " + temp_lines[i].ljust(box_width - 4) + " ║")
-
-                final_platform_details_lines.append(footer)
+                        req_text = str(plat_requirements)
 
                 dispatcher.utter_message(text="✅ Good news! This game is available on that platform.")
-                dispatcher.utter_message(text="\n".join(final_platform_details_lines))
+                dispatcher.utter_message(text="\n".join(platform_details_lines))
                 return [SlotSet("game_id", None), SlotSet("game_title", None), SlotSet("platform", None)]
             else:
                 dispatcher.utter_message(text=f"❌ Unfortunately, '{details.get('name')}' is not available on {platform_slot}.")
@@ -701,6 +667,153 @@ class ActionCheckCompatibility(Action):
         except Exception as e:
             print(f"❌ Error checking compatibility: {e}")
             dispatcher.utter_message(text="💥 Something went wrong while checking compatibility. Please try again later.")
+            return [SlotSet("game_id", None), SlotSet("game_title", None)]
+
+
+class ActionCheckPlatformRequirements(Action):
+    """Check platform requirements for a given game."""
+
+    def name(self) -> Text:
+        return "action_check_platform_requirements"
+
+    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        # Get fresh entities if present (prioritize entities over slots)
+        entities = tracker.latest_message.get("entities", [])
+        game_title_entity = next((e for e in entities if e["entity"] == "game_title"), None)
+        platform_entity = next((e for e in entities if e["entity"] == "platform"), None)
+
+        game_title = game_title_entity["value"] if game_title_entity else tracker.get_slot("game_title")
+        platform_slot = platform_entity["value"] if platform_entity else tracker.get_slot("platform")
+
+        if not game_title:
+            dispatcher.utter_message(response="utter_ask_game_name")
+            return [SlotSet("game_title", None)]
+
+        if not platform_slot or platform_slot in ["skip", "skipped", "any", "none"]:
+            dispatcher.utter_message(response="utter_ask_platform_for_requirements")
+            return [SlotSet("platform", None)]
+
+        dispatcher.utter_message(text=f"🔎 Checking requirements for '{game_title}' on {platform_slot}...")
+
+        # Normalize platform
+        normalized_platform = platform_slot.lower().strip()
+        mapped_platform = get_platform_id(normalized_platform)
+
+        # Search for the game to get id
+        search_params = {"key": API_KEY, "search": game_title, "page_size": 1}
+        try:
+            search_resp = requests.get(f"{BASE_URL}/games", params=search_params)
+            search_resp.raise_for_status()
+            results = search_resp.json().get("results", [])
+            if not results:
+                dispatcher.utter_message(response="utter_game_not_found")
+                return [SlotSet("game_title", None)]
+            game = results[0]
+            game_id = game.get("id")
+        except Exception as e:
+            print(f"❌ Error searching for game: {e}")
+            dispatcher.utter_message(text="💥 Something went wrong while searching the games. Please try again.")
+            return [SlotSet("game_title", None)]
+
+        # Get game details
+        try:
+            resp = requests.get(f"{BASE_URL}/games/{game_id}", params={"key": API_KEY})
+            resp.raise_for_status()
+            details = resp.json()
+
+            platforms = details.get("platforms", [])  # list of {'platform': {...}, 'released_at':..., 'requirements'...}
+
+            if not platforms:
+                dispatcher.utter_message(text=f"I couldn't find platform data for '{game_title}'.")
+                return [SlotSet("game_title", None), SlotSet("game_id", None)]
+
+            # Try to find the platform entry
+            matched_platform_entry = None
+            for p in platforms:
+                plat_obj = p.get("platform", {})
+                plat_name = (plat_obj.get("name") or "")
+                plat_slug = (plat_obj.get("slug") or "").lower()
+                plat_id = plat_obj.get("id")
+
+                if isinstance(mapped_platform, int) or (isinstance(mapped_platform, str) and mapped_platform.isdigit()):
+                    try:
+                        if plat_id and int(mapped_platform) == int(plat_id):
+                            matched_platform_entry = p
+                            break
+                    except Exception:
+                        pass
+                
+                if mapped_platform and isinstance(mapped_platform, str):
+                    if mapped_platform.lower() == plat_slug or mapped_platform.lower() == plat_name:
+                        matched_platform_entry = p
+                        break
+
+                ratio_name = SequenceMatcher(None, normalized_platform, plat_name).ratio() if plat_name else 0
+                ratio_slug = SequenceMatcher(None, normalized_platform, plat_slug).ratio() if plat_slug else 0
+                if max(ratio_name, ratio_slug) >= 0.8:
+                    matched_platform_entry = p
+                    break
+            
+            if matched_platform_entry:
+                plat_obj = matched_platform_entry.get("platform", {})
+                plat_name = plat_obj.get("name")
+                requirements = matched_platform_entry.get("requirements", {}) or plat_obj.get("requirements_en", {}) or matched_platform_entry.get("requirements_en")
+                
+                if requirements:
+                    formatted_requirements = []
+                    if isinstance(requirements, dict):
+                        for req_type, req_value in requirements.items():
+                            req_type = req_type.replace('_', ' ').capitalize()
+                            formatted_requirements.append(f"\n\n{'🙏' if req_type == 'Minimum' else '👌'} {req_type}:")
+                            
+                            if isinstance(req_value, str):
+                                desired_specs = ["Processor", "Memory", "Graphics", "Storage"]
+                                extracted_specs = {}
+
+                                for spec in desired_specs:
+                                    # A more robust regex to capture the value of a spec until the next known spec or end of string
+                                    # This handles multi-line values better
+                                    # We use a non-greedy match (.*?) and look ahead for the next spec or the end of the string
+                                    pattern = f"{spec}:\\s*(.*?)(?=\\s*(?:Processor|Memory|Graphics|Storage|OS|DirectX|Sound Card|Additional Notes):|$)"
+                                    match = re.search(pattern, req_value, re.IGNORECASE | re.DOTALL)
+                                    if match:
+                                        # Clean up the found value: remove extra spaces and newlines
+                                        value = ' '.join(match.group(1).strip().split())
+                                        extracted_specs[spec] = value
+                                
+                                if extracted_specs:
+                                    for spec, value in extracted_specs.items():
+                                        formatted_requirements.append(f"   - {spec}: {value}")
+                                else:
+                                    # Fallback if the detailed parsing fails
+                                    formatted_requirements.append("    Could not parse detailed specs. Full info: " + req_value.strip())
+
+                            else:
+                                formatted_requirements.append(f"    {str(req_value).strip()}")
+                    else:
+                        # Fallback for when requirements is just a string
+                        formatted_requirements.append(str(requirements))
+                    
+                    req_text = "\n".join(formatted_requirements)
+                    message = f"⚙️ Requirements for {game_title} on {plat_name}:\n{req_text}"
+                    dispatcher.utter_message(text=message)
+                else:
+                    dispatcher.utter_message(text=f"🤷‍♂️ No requirements found for '{game_title}' on {plat_name}.")
+            
+            else:
+                dispatcher.utter_message(text=f"❌ Could not find platform '{platform_slot}' for the game '{game_title}'.")
+
+            return [SlotSet("game_id", None), SlotSet("game_title", None), SlotSet("platform", None)]
+
+        except requests.exceptions.HTTPError as e:
+            if e.response.status_code == 404:
+                dispatcher.utter_message(text=f"❌ Game with ID '{game_id}' not found.")
+            else:
+                dispatcher.utter_message(text="👾 I couldn't fetch the game details. Please try again later.")
+            return [SlotSet("game_id", None), SlotSet("game_title", None)]
+        except Exception as e:
+            print(f"❌ Error checking requirements: {e}")
+            dispatcher.utter_message(text="💥 Something went wrong while checking requirements. Please try again later.")
             return [SlotSet("game_id", None), SlotSet("game_title", None)]
 
 
