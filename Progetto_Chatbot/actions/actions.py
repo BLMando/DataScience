@@ -7,7 +7,7 @@ from difflib import SequenceMatcher
 import requests
 from dotenv import load_dotenv
 import os
-from .utils import get_platform_id, get_genre_id, get_developer_slug, format_game_snapshot
+from .utils import get_platform_id, get_genre_id, get_developer_id, get_developer_slug, format_game_snapshot
 
 load_dotenv()
 API_KEY = os.getenv("RAWG_API_KEY")
@@ -335,3 +335,167 @@ class ActionGameDetails(Action):
             print(f"Error: {e}")
             dispatcher.utter_message(text="💥 Critical Hit! Something went wrong. Please try again.")
             return [SlotSet("game_id", None), SlotSet("game_title", None)]
+
+
+class ActionListGamesByGenre(Action):
+    """List games filtered by a specific genre."""
+    
+    def name(self) -> Text:
+        return "action_list_games_by_genre"
+
+    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        entities = tracker.latest_message.get("entities", [])
+        genre_entity = next((e for e in entities if e["entity"] == "genre"), None)
+        
+        if not genre_entity:
+            dispatcher.utter_message(text="🤔 Which genre would you like to explore? (Action, RPG, Strategy, Adventure, etc.)")
+            return []
+        
+        genre = genre_entity["value"].lower()
+        print(f"🎮 [ActionListGamesByGenre] Listing games for genre: '{genre}'")
+        
+        genre_id = get_genre_id(genre)
+        if not genre_id:
+            dispatcher.utter_message(text=f"❌ I don't recognize '{genre}' as a valid genre. Try Action, RPG, Strategy, etc.")
+            return []
+        
+        params = {
+            "key": API_KEY,
+            "genres": genre_id,
+            "page_size": 10,
+            "ordering": "rating"
+        }
+        
+        try:
+            print(f"  Genre ID: {genre_id}")
+            response = requests.get(f"{BASE_URL}/games", params=params)
+            response.raise_for_status()
+            data = response.json()
+            results = data.get("results", [])
+            print(f"  ✅ Found {len(results)} games")
+            
+            if not results:
+                dispatcher.utter_message(response="utter_game_not_found")
+                return []
+            
+            # Display header
+            dispatcher.utter_message(text=f"🎮 Top rated {genre.upper()} games:\n")
+            
+            # Display games
+            for idx, game in enumerate(results, 1):
+                title = game.get("name")
+                rating = game.get("rating", "N/A")
+                released = game.get("released", "N/A")
+                background_image = game.get("background_image")
+                
+                game_msg = f"{idx}. 🎮 {title}\n"
+                game_msg += f"   📅 Released: {released}\n"
+                game_msg += f"   ⭐ Rating: {rating}/5\n"
+                
+                if background_image:
+                    dispatcher.utter_message(text=game_msg, image=background_image)
+                else:
+                    dispatcher.utter_message(text=game_msg)
+        
+        except Exception as e:
+            print(f"  ❌ [ActionListGamesByGenre] Error: {e}")
+            dispatcher.utter_message(text="💥 Critical Hit! Something went wrong. Please try again.")
+        
+        return []
+
+
+class ActionListGamesByDeveloper(Action):
+    """List best games by a specific developer."""
+    
+    def name(self) -> Text:
+        return "action_list_games_by_developer"
+
+    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        try:
+            entities = tracker.latest_message.get("entities", [])
+            developer_entity = next((e for e in entities if e["entity"] == "developer"), None)
+            
+            if not developer_entity:
+                dispatcher.utter_message(text="🤔 Which developer would you like to explore? (Valve, Nintendo, Ubisoft, etc.)")
+                return []
+            
+            developer = developer_entity["value"]
+            print(f"🎮 [ActionListGamesByDeveloper] Listing games by developer: '{developer}'")
+            
+            # Get the developer ID from the mapping
+            dev_id = get_developer_id(developer)
+            print(f"  Developer ID from mapping: {dev_id}")
+            
+            if not dev_id:
+                # If not in mapping, try searching for developer
+                print(f"  ⚠️  Developer not in mapping, searching for developer...")
+                search_params = {
+                    "key": API_KEY,
+                    "search": developer,
+                    "page_size": 5
+                }
+                try:
+                    search_response = requests.get(f"{BASE_URL}/developers", params=search_params, timeout=10)
+                    search_response.raise_for_status()
+                    dev_results = search_response.json().get("results", [])
+                    
+                    if dev_results:
+                        dev_id = dev_results[0].get("id")
+                        print(f"  ✅ Found developer ID: {dev_id}")
+                    else:
+                        print(f"  ❌ Developer '{developer}' not found")
+                        dispatcher.utter_message(text=f"❌ I couldn't find any developer named '{developer}'.")
+                        return []
+                except Exception as search_err:
+                    print(f"  ❌ Error searching for developer: {search_err}")
+                    dispatcher.utter_message(text="💥 Critical Hit! Something went wrong. Please try again.")
+                    return []
+            
+            # Query games by developer ID
+            params = {
+                "key": API_KEY,
+                "developers": dev_id,
+                "page_size": 10,
+                "ordering": "-rating"
+            }
+            
+            response = requests.get(f"{BASE_URL}/games", params=params, timeout=10)
+            response.raise_for_status()
+            data = response.json()
+            results = data.get("results", [])
+            print(f"  ✅ Found {len(results)} games for developer ID: {dev_id}")
+            
+            if not results:
+                dispatcher.utter_message(response="utter_game_not_found")
+                return []
+            
+            # Display header
+            dispatcher.utter_message(text=f"🎮 Top rated {developer.upper()} games:\n")
+            
+            # Display games
+            for idx, game in enumerate(results, 1):
+                title = game.get("name")
+                rating = game.get("rating", "N/A")
+                released = game.get("released", "N/A")
+                background_image = game.get("background_image")
+                
+                game_msg = f"{idx}. 🎮 {title}\n"
+                game_msg += f"   📅 Released: {released}\n"
+                game_msg += f"   ⭐ Rating: {rating}/5\n"
+                
+                if background_image:
+                    dispatcher.utter_message(text=game_msg, image=background_image)
+                else:
+                    dispatcher.utter_message(text=game_msg)
+            
+            return []
+        
+        except Exception as e:
+            print(f"  ❌ [ActionListGamesByDeveloper] Critical Error: {type(e).__name__}: {e}")
+            import traceback
+            traceback.print_exc()
+            try:
+                dispatcher.utter_message(text="💥 Oops! Something went wrong. Please try again.")
+            except:
+                pass
+            return []

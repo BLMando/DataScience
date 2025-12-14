@@ -9,6 +9,8 @@ intents:
   - bot_abilities
   - search_game
   - search_game_by_name
+  - list_games_by_genre
+  - list_games_by_developer
   - game_details
   - inform
   - skip
@@ -145,6 +147,8 @@ responses:
 actions:
   - action_search_game_by_name
   - action_recommend_games
+  - action_list_games_by_genre
+  - action_list_games_by_developer
   - action_game_details
   - action_my_fallback
   - validate_game_search_form
