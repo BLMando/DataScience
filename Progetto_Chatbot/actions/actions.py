@@ -21,7 +21,7 @@ class ActionMyFallback(Action):
 
     def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
         dispatcher.utter_message(response="utter_fallback")
-        return [SlotSet("game_title", None), SlotSet("genre", None), SlotSet("platform", None)]
+        return [SlotSet("game_title", None), SlotSet("genre", None), SlotSet("platform", None), SlotSet("developer", None), SlotSet("game_id", None)]
 
 class ValidateGameSearchForm(FormValidationAction):
     def name(self) -> Text:
