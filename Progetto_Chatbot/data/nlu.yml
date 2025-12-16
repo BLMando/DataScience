@@ -224,6 +224,99 @@ nlu:
       - what about [bloodborne](game_title)?
       - can you find [genshin impact](game_title)?
 
+# ============================================================================
+# LIST GAMES BY GENRE
+# ============================================================================
+
+  - intent: list_games_by_genre
+    examples: |
+      - show me [action](genre) games
+      - list [RPG](genre) games
+      - what [strategy](genre) games are there?
+      - give me [shooter](genre) games
+      - find me [adventure](genre) games
+      - show [indie](genre) titles
+      - what [racing](genre) games are available?
+      - list the best [puzzle](genre) games
+      - can you show me [fighting](genre) games?
+      - i want to see [sports](genre) games
+      - display [simulation](genre) games
+      - show all [platformer](genre) games
+      - what games in the [casual](genre) genre?
+      - list [horror](genre) games
+      - give me [arcade](genre) games
+      - show me games in [action](genre) genre
+      - i'm interested in [RPG](genre) games
+      - what are the best [strategy](genre) games?
+      - find [multiplayer](genre) games
+      - show [turn-based](genre) games
+      - recommend [adventure](genre) titles
+      - top [indie](genre) games
+      - best [horror](genre) games please
+      - can i see [sandbox](genre) games?
+      - show me some [stealth](genre) games
+      - i want [battle royale](genre) games
+      - list [survival](genre) titles
+      - what about [roguelike](genre) games?
+      - find [metroidvania](genre) games
+      - show [souls-like](genre) titles
+      - i like [open world](genre) games
+      - display [tactical](genre) games
+      - [first-person shooter](genre) please
+      - best [turn-based strategy](genre) games
+      - show [visual novel](genre) titles
+      - find [rhythm](genre) games
+      - what [tower defense](genre) games?
+      - can you show [roguelite](genre) games?
+      - i'm interested in [hack and slash](genre)
+      - show the best [action adventure](genre)
+      - find me [isometric](genre) games
+      - what [twin-stick shooter](genre) games exist?
+
+  # ============================================================================
+  # LIST BEST GAMES BY DEVELOPER
+  # ============================================================================
+
+  - intent: list_games_by_developer
+    examples: |
+      - show me [Valve](developer) games
+      - list [Nintendo](developer) games
+      - what [Ubisoft](developer) games are there?
+      - give me [Sony](developer) games
+      - find me [Microsoft](developer) games
+      - show [EA](developer) titles
+      - what [Bethesda](developer) games are available?
+      - list the best [FromSoftware](developer) games
+      - can you show me [Rockstar Games](developer) games?
+      - i want to see [Capcom](developer) games
+      - display [Square Enix](developer) games
+      - show all [Bandai Namco](developer) games
+      - what games by [Naughty Dog](developer)?
+      - list [CD Projekt Red](developer) games
+      - give me [Insomniac Games](developer) games
+      - show me games by [Valve](developer)
+      - i'm interested in [Nintendo](developer) games
+      - what are the best [Ubisoft](developer) games?
+      - find [Sony](developer) games
+      - show [Electronic Arts](developer) titles
+      - best [Bethesda](developer) games
+      - games by [Konami](developer)
+      - [Sega](developer) classics
+      - what about [Mojang](developer)?
+      - [Obsidian Entertainment](developer) titles are good
+      - i like [BioWare](developer) can you show me?
+      - [Respawn Entertainment](developer) games for sure
+      - show me [Guerrilla Games](developer) games
+      - i'm a fan of [Santa Monica Studio](developer)
+      - recommend me [Kojima Productions](developer) games
+      - best games from [Rare](developer)
+      - [Atlus](developer) games please
+      - show [Level-5](developer) titles
+      - find [Game Freak](developer) games
+      - [Blizzard Entertainment](developer) best games
+      - top games by [Riot Games](developer)
+      - [Epic Games](developer) recommendations
+
   # ============================================================================
   # GAME DETAILS
   # ============================================================================

@@ -95,10 +95,24 @@ rules:
       - intent: search_game_by_name
       - action: action_search_game_by_name
 
+  - rule: List games by genre
+    condition:
+    - active_loop: null
+    steps:
+    - intent: list_games_by_genre
+    - action: action_list_games_by_genre
+
+  - rule: List games by developer
+    condition:
+    - active_loop: null
+    steps:
+    - intent: list_games_by_developer
+    - action: action_list_games_by_developer
+
   - rule: Show game details
     steps:
-      - intent: game_details
-      - action: action_game_details
+        - intent: game_details
+        - action: action_game_details
 
   - rule: Handle deny after search
     condition:

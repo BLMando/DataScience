@@ -107,6 +107,83 @@ def get_developer_slug(developer_name: str) -> str:
         return None
     return developer_name.lower().replace(" ", "-")
 
+def get_developer_id(developer_name: str) -> int:
+    """Maps user-provided developer names to RAWG API developer IDs."""
+    if not developer_name:
+        return None
+    
+    developer_name = developer_name.lower().strip()
+
+    mapping = {
+        # Major publishers
+        "valve": 1612,                 # Valve
+        "nintendo": 16257,             # Nintendo
+        "ubisoft": 405,                # Ubisoft
+        "sony": 14629,                 # Sony Computer Entertainment
+        "microsoft": 14020,            # Microsoft
+        "electronic arts": 109,        # Electronic Arts
+        "ea": 109,                     # Electronic Arts
+        "bethesda": 4,                 # Bethesda Softworks
+        "rockstar games": 10,          # Rockstar Games
+        "rockstar": 10,                # Rockstar Games
+        "cd projekt red": 9023,        # CD Projekt Red
+        "capcom": 3678,                # Capcom
+        "bandai namco": 388587,        # Bandai Namco Entertainment
+        "bandai": 388587,              # Bandai Namco Entertainment
+        "konami": 316882,              # Konami
+        "sega": 425,                   # Sega
+        "square enix": 4132,           # Square Enix
+        "square": 4132,                # Square Enix
+        
+        # PlayStation studios
+        "naughty dog": 13071,          # Naughty Dog
+        "insomniac games": 5342,       # Insomniac Games
+        "insomniac": 5342,             # Insomniac Games
+        "guerrilla games": 17202,      # Guerrilla Games
+        "guerrilla": 17202,            # Guerrilla Games
+        "sucker punch productions": 18487, # Sucker Punch Productions
+        "sucker punch": 18487,         # Sucker Punch Productions
+        "santa monica studio": 14278,  # Santa Monica Studio
+        "santa monica": 14278,         # Santa Monica Studio
+        "polyphony digital": 14277,    # Polyphony Digital
+        
+        # From Software / Bandai
+        "fromsoftware": 6763,          # FromSoftware
+        "from software": 6763,         # FromSoftware
+        
+        # Other major studios
+        "kojima productions": 9300,    # Kojima Productions
+        "kojima": 9300,                # Kojima Productions
+        "platinum games": 197801,      # PlatinumGames
+        "platinumgames": 197801,       # PlatinumGames
+        "atlus": 13953,                # Atlus
+        "level-5": 132405,             # Level-5
+        "game freak": 8230,            # Game Freak
+        "intelligent systems": 12898,  # Intelligent Systems
+        "hal laboratory": 14505,       # HAL Laboratory
+        "monolith soft": 27291,        # Monolith Soft
+        "retro studios": 26308,        # Retro Studios
+        "rare": 13836,                 # Rare
+        "mojang": 313,                 # Mojang
+        "obsidian entertainment": 409, # Obsidian Entertainment
+        "obsidian": 409,               # Obsidian Entertainment
+        "bioware": 8933,               # BioWare
+        "respawn entertainment": 19732, # Respawn Entertainment
+        "respawn": 19732,              # Respawn Entertainment
+        "quantic dream": 13214,        # Quantic Dream
+        "remedy entertainment": 6294,  # Remedy Entertainment
+        "remedy": 6294,                # Remedy Entertainment
+        "io interactive": 4033,        # IO Interactive
+        "io": 4033,                    # IO Interactive
+    }
+    
+    # Return from mapping if exists
+    if developer_name in mapping:
+        return mapping[developer_name]
+    
+    # Fallback: return None if not found
+    return None
+
 
 def format_game_snapshot(dispatcher: CollectingDispatcher, game: Dict[Text, Any]):
     """Format and display basic game info (snapshot view)."""
