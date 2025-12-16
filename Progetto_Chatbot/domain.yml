@@ -86,8 +86,26 @@ responses:
     - text: "Hey there! 🎮 Ready to find some epic loot (games)?"
   
   utter_bot_abilities:
-    - text: "I'm a level 99 Game Assistant! 🧙‍♂️\nI can help you find games by:\n- 🎭 Genre\n- 💻 Platform\n- 🏢 Developer\n\nJust ask me to 'find a game' or 'search for [Game Name]'!"
-    - text: "My main quest is to help you discover games. 🗺️\nI can search for specific titles or recommend games based on your preferences. Try me!" 
+    - text: |
+        I'm a level 99 Game Assistant! 🧙‍♂️ Here's my skill tree 🌳:
+        
+        🔍 **Searching & Lists**
+        - "Search for [Game Name]" - Find a specific game.
+        - "Recommend games" - Get recommendations based on genre, platform, or developer.
+        - "List [Genre] games" - See top games in a genre (e.g., "List RPG games").
+        - "Best games by [Developer]" - See hits from a studio (e.g., "Best games by Nintendo").
+
+        ℹ️ **Game Intel**
+        - "Details about [Game]" - Get description, rating, playtime, etc.
+        - "Show DLC for [Game]" - Check expansions and editions.
+        - "Series like [Game]" - Find other games in the same series.
+        - "Where to buy [Game]" - List stores selling the game.
+
+        🛠️ **Tech Specs**
+        - "Platform check [Game] on [Platform]" - Can I play it on my console?
+        - "Requirements for [Game]" - See PC system specs.
+
+        Just say "Help" anytime to see this menu again!
   
   utter_goodbye:
     - text: "Game Over! 👾 Thanks for playing. See you next time!"
@@ -105,13 +123,13 @@ responses:
 
 
   utter_fallback:
-    - text: "Lag spike! 📶 I didn't catch that. What would you like to do?"
+    - text: "Lag spike! 📶 I didn't catch that. Try one of these commands or ask for 'help' ❓."
       buttons:
-        - title: "🔍 Search for a Game"
-          payload: "/search_game"
-        - title: "🎮 Search by Name"
+        - title: "🔍 Search Game by Name"
           payload: "/search_game_by_name"
-        - title: "❓ Help"
+        - title: "🎮 Recommend Games"
+          payload: "/recommend_games"
+        - title: "❓ Bot Abilities"
           payload: "/bot_abilities"
 
   utter_ask_platform:
