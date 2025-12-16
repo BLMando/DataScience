@@ -15,7 +15,8 @@ intents:
   - fetch_game_stores
   - inform
   - skip
-
+  - check_compatibility_with_platform
+  - check_platform_requirements
 
 entities:
   - game_title
@@ -114,6 +115,9 @@ responses:
   utter_ask_platform:
     - text: "Choose your weapon! ⚔️ Which platform? (PC, PS5, Xbox, etc. or type 'skip')"
     - text: "Where will you be playing? 🕹️ (e.g., PC, Switch, PS4... or 'skip')"
+  
+  utter_ask_platform_for_requirements:
+    - text: "For which platform do you want to know the requirements?"
 
   utter_ask_genre:
     - text: "Pick your class! 🛡️ What genre interests you? (Action, RPG, Strategy... or 'skip')"
@@ -155,6 +159,8 @@ actions:
   - action_game_dlc
   - action_fetch_game_series
   - action_game_stores
+  - action_check_compatibility
+  - action_check_platform_requirements
 
 config:
   store_entities_as_slots: true

@@ -1,80 +1,196 @@
 version: "3.1"
 
 stories:
+  - story: Game Recommendation - Happy Path
+    steps:
+      - intent: greet
+      - action: utter_greet
+      - intent: search_game
+      - action: game_search_form
+      - active_loop: game_search_form
+      - active_loop: null
+      - slot_was_set:
+          - requested_slot: null
+      - action: utter_submit_game_search_form
+      - action: action_recommend_games
 
+  - story: Game Recommendation with Skip
+    steps:
+      - intent: greet
+      - action: utter_greet
+      - intent: search_game
+      - action: game_search_form
+      - active_loop: game_search_form
+      - intent: skip
+      - action: game_search_form
+      - active_loop: null
+      - slot_was_set:
+          - requested_slot: null
+      - action: utter_submit_game_search_form
+      - action: action_recommend_games
 
-- story: Game Recommendation - Happy Path
-  steps:
-  - intent: greet
-  - action: utter_greet
-  - intent: search_game
-  - action: game_search_form
-  - active_loop: game_search_form
-  - active_loop: null
-  - slot_was_set:
-    - requested_slot: null
-  - action: utter_submit_game_search_form
-  - action: action_recommend_games
+  - story: Search Game by Title
+    steps:
+      - intent: search_game_by_name
+      - slot_was_set:
+          - game_title: "The Witcher 3"
+      - action: action_search_game_by_name
+      - slot_was_set:
+          - game_id: "123"
 
-- story: Game Recommendation with Skip
-  steps:
-  - intent: greet
-  - action: utter_greet
-  - intent: search_game
-  - action: game_search_form
-  - active_loop: game_search_form
-  - intent: skip
-  - action: game_search_form
-  - active_loop: null
-  - slot_was_set:
-    - requested_slot: null
-  - action: utter_submit_game_search_form
-  - action: action_recommend_games
+  - story: Search Game by Title then Details
+    steps:
+      - intent: search_game_by_name
+      - slot_was_set:
+          - game_title: "The Witcher 3"
+      - action: action_search_game_by_name
+      - intent: game_details
+      - action: action_game_details
 
+  - story: View Game Details after Search
+    steps:
+      - action: action_search_game_by_name
+      - intent: game_details
+      - action: action_game_details
 
-- story: Search Game by Title
-  steps:
-  - intent: search_game_by_name
-  - slot_was_set:
-    - game_title: "The Witcher 3"
-  - action: action_search_game_by_name
-  - slot_was_set:
-    - game_id: "123"
+  - story: User asks for DLCs after searching for a game
+    steps:
+      - intent: fetch_dlcs_and_editions
+      - slot_was_set:
+          - game_title: "Cyberpunk 2077"
+      - action: action_game_dlc
 
-- story: Search Game by Title then Details
-  steps:
-  - intent: search_game_by_name
-  - slot_was_set:
-    - game_title: "The Witcher 3"
-  - action: action_search_game_by_name
-  - intent: game_details
-  - action: action_game_details
+  - story: User requests game series
+    steps:
+      - intent: fetch_game_series
+        entities:
+          - game_title: "Elden Ring"
+      - action: action_fetch_game_series
 
-- story: View Game Details after Search
-  steps:
-  - action: action_search_game_by_name
-  - intent: game_details
-  - action: action_game_details
+  - story: User requests game stores
+    steps:
+      - intent: fetch_game_stores
+        entities:
+          - game_title: "Halo Infinite"
+      - action: action_game_stores
 
+  - story: Check compatibility - happy path (entities)
+    steps:
+      - intent: check_compatibility_with_platform
+        entities:
+          - game_title: "The Witcher 3"
+          - platform: "PC"
+      - action: action_check_compatibility
+      - slot_was_set:
+          - game_id: null
+          - game_title: null
+          - platform: null
 
-- story: User asks for DLCs after searching for a game
-  steps:
-  - intent: fetch_dlcs_and_editions
-  - slot_was_set:
-    - game_title: "Cyberpunk 2077"
-  - action: action_game_dlc
+  - story: Check compatibility - missing platform (user supplies later)
+    steps:
+      - intent: check_compatibility_with_platform
+        entities:
+          - game_title: "Hades"
+      - action: action_check_compatibility
+      - action: action_listen
+      - intent: inform
+        entities:
+          - platform: "Switch"
+      - action: action_check_compatibility
+      - slot_was_set:
+          - game_id: null
+          - game_title: null
+          - platform: null
 
-- story: User requests game series
-  steps:
-    - intent: fetch_game_series
-      entities:
-        - game_title: "Elden Ring"
-    - action: action_fetch_game_series
+  - story: Check compatibility - missing game title (user supplies later)
+    steps:
+      - intent: check_compatibility_with_platform
+        entities:
+          - platform: "PC"
+      - action: action_check_compatibility
+      - action: action_listen
+      - intent: inform
+        entities:
+          - game_title: "Stardew Valley"
+      - action: action_check_compatibility
+      - slot_was_set:
+          - game_id: null
+          - game_title: null
+          - platform: null
 
-- story: User requests game stores
-  steps:
-    - intent: fetch_game_stores
-      entities:
-        - game_title: "Halo Infinite"
-    - action: action_game_stores
-    
+  - story: Check compatibility - using pre-set slots
+    steps:
+      - slot_was_set:
+          - game_title: "Sekiro"
+          - platform: "PS5"
+      - intent: check_compatibility_with_platform
+      - action: action_check_compatibility
+      - slot_was_set:
+          - game_id: null
+          - game_title: null
+          - platform: null
+
+  - story: Check compatibility - not available on platform
+    steps:
+      - intent: check_compatibility_with_platform
+        entities:
+          - game_title: "FIFA 21"
+          - platform: "Switch"
+      - action: action_check_compatibility
+      - slot_was_set:
+          - game_id: null
+          - game_title: null
+          - platform: null
+
+  - story: Check compatibility - interrupts the form and resumes
+    steps:
+      - intent: search_game
+      - action: game_search_form
+      - active_loop: game_search_form
+      - intent: check_compatibility_with_platform
+        entities:
+          - game_title: "Elden Ring"
+          - platform: "PC"
+      - action: action_check_compatibility
+      - action: game_search_form
+      - active_loop: game_search_form
+
+  - story: Confirm showing details (use affirm)
+    steps:
+      - intent: search_game_by_name
+      - slot_was_set:
+          - game_title: "The Witcher 3"
+      - action: action_search_game_by_name
+      - intent: affirm
+      - action: action_game_details
+
+  - story: Check platform requirements - Happy Path
+    steps:
+      - intent: check_platform_requirements
+        entities:
+          - game_title: "Minecraft"
+          - platform: "PC"
+      - action: action_check_platform_requirements
+
+  - story: Check platform requirements - Missing platform
+    steps:
+      - intent: check_platform_requirements
+        entities:
+          - game_title: "Minecraft"
+      - action: action_check_platform_requirements
+      - intent: inform
+        entities:
+          - platform: "PC"
+      - action: action_check_platform_requirements
+
+  - story: Check platform requirements - Missing game title
+    steps:
+      - intent: check_platform_requirements
+        entities:
+          - platform: "PC"
+      - action: action_check_platform_requirements
+      - intent: inform
+        entities:
+          - game_title: "Minecraft"
+      - action: action_check_platform_requirements
+
