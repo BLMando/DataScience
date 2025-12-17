@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎯 Attempts - Trivia Analytics</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+  <div class="dashboard-layout">
+    <header class="header">
+      <div class="header-content">
+        <a href="../index.html" class="logo">
+          <span class="logo-icon">📊</span>
+          <span>Trivia Analytics</span>
+        </a>
+        <nav class="nav">
+          <a href="../index.html" class="nav-link">Overview</a>
+          <a href="users.html" class="nav-link">Users</a>
+          <a href="questions.html" class="nav-link">Questions</a>
+          <a href="attempts.html" class="nav-link active">Attempts</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="main">
+      <div class="page-header">
+        <h1 class="page-title">🎯 Quiz Attempts Performance</h1>
+        <p class="page-subtitle">Performance quiz, distribuzione punteggi, trend temporali e tempi di completamento</p>
+      </div>
+
+      <!-- KPIs -->
+      <div class="kpi-grid" id="kpis"></div>
+
+      <div class="grid-2">
+        <!-- Score Distribution -->
+        <div class="section">
+          <h3 class="section-title">📊 Distribuzione Punteggi</h3>
+          <div class="chart-bar" id="score-chart"></div>
+        </div>
+
+        <!-- Daily Trend -->
+        <div class="section">
+          <h3 class="section-title">📅 Tentativi Ultimi 7 Giorni</h3>
+          <div class="h-bars" id="daily-chart"></div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <!-- Time Distribution -->
+        <div class="section">
+          <h3 class="section-title">⏱️ Distribuzione Tempi</h3>
+          <div class="chart-bar" id="time-chart"></div>
+        </div>
+
+        <!-- Correct Answers Distribution -->
+        <div class="section">
+          <h3 class="section-title">✅ Risposte Corrette per Quiz</h3>
+          <div class="chart-bar" id="correct-chart"></div>
+        </div>
+      </div>
+
+      <!-- Sample Data -->
+      <div class="section">
+        <h3 class="section-title">📋 Ultimi Tentativi</h3>
+        <div id="attempts-table"></div>
+      </div>
+
+      <!-- Insights -->
+      <div class="section">
+        <h3 class="section-title">💡 Insight Analitici</h3>
+        <div class="insights-list" id="insights"></div>
+      </div>
+    </main>
+
+    <footer class="footer">
+      Trivia Quiz Analytics Dashboard • Dati mock a scopo dimostrativo
+    </footer>
+  </div>
+
+  <script src="../assets/site.js"></script>
+  <script src="attempts-data.js"></script>
+  <script>
+    // KPIs
+    Render.kpi('kpis', [
+      { label: 'Tentativi Totali', value: AttemptsData.total, color: 'primary' },
+      { label: 'Score Medio', value: AttemptsData.avgScore + '%', color: 'success' },
+      { label: 'Tempo Medio', value: Utils.formatTime(AttemptsData.avgTime), color: 'cyan' },
+      { label: 'Media Corrette', value: AttemptsData.avgCorrect + '/10', color: 'purple' },
+      { label: 'Quiz Perfetti', value: AttemptsData.perfectScores, color: 'success', change: '5.8% del totale', changeDir: 'up' },
+      { label: 'Score <40%', value: AttemptsData.failedAttempts, color: 'error' },
+    ]);
+
+    // Score Distribution
+    Render.barChart('score-chart', AttemptsData.scoreDistribution);
+
+    // Daily Trend
+    Render.verticalBars('daily-chart', AttemptsData.dailyTrend, 'primary');
+
+    // Time Distribution
+    Render.barChart('time-chart', AttemptsData.timeDistribution);
+
+    // Correct Answers Distribution
+    Render.barChart('correct-chart', AttemptsData.correctDistribution.map((d, i) => ({
+      ...d,
+      color: i < 2 ? 'error' : i < 3 ? 'warning' : 'success'
+    })));
+
+    // Table
+    Render.table('attempts-table', [
+      { key: 'id', label: 'ID' },
+      { key: 'username', label: 'Utente', render: v => `<strong>${v}</strong>` },
+      { key: 'score', label: 'Score', render: v => `<span class="badge ${v >= 70 ? 'success' : v >= 50 ? 'warning' : 'error'}">${v}%</span>` },
+      { key: 'correct_count', label: 'Corrette', render: (v, row) => `${v}/${row.total_questions}` },
+      { key: 'time_seconds', label: 'Tempo', render: v => Utils.formatTime(v) },
+      { key: 'completed_at', label: 'Data', render: v => Utils.formatDate(v) },
+    ], AttemptsData.sampleRecords);
+
+    // Insights
+    Render.insights('insights', AttemptsData.insights);
+  </script>
+</body>
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Trivia Quiz - Metti alla prova le tue conoscenze con quiz interattivi">
+  <title>🎮 Trivia Quiz</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <!-- Background Effects -->
+    <div class="bg-effects">
+      <div class="gradient-orb orb-1"></div>
+      <div class="gradient-orb orb-2"></div>
+      <div class="gradient-orb orb-3"></div>
+    </div>
+
+    <!-- Login Screen -->
+    <section id="login-screen" class="screen active">
+      <div class="card glass">
+        <div class="logo">
+          <span class="logo-icon">🎮</span>
+          <h1>Trivia Quiz</h1>
+        </div>
+        <p class="tagline">Metti alla prova le tue conoscenze!</p>
+        
+        <form id="login-form">
+          <div class="input-group">
+            <input type="text" id="username-input" placeholder="Il tuo username" required minlength="2" maxlength="20">
+            <span class="input-icon">👤</span>
+          </div>
+          <button type="submit" class="btn btn-primary btn-glow">
+            <span>Inizia a Giocare</span>
+            <span class="btn-icon">→</span>
+          </button>
+        </form>
+        
+        <p id="login-error" class="error-message"></p>
+      </div>
+    </section>
+
+    <!-- Home Screen -->
+    <section id="home-screen" class="screen">
+      <header class="header">
+        <div class="user-info">
+          <span class="user-avatar">👤</span>
+          <span id="display-username" class="username"></span>
+        </div>
+        <button id="logout-btn" class="btn btn-outline btn-small">Esci</button>
+      </header>
+
+      <div class="home-content">
+        <div class="card glass stats-card">
+          <h2>📊 Le Tue Statistiche</h2>
+          <div class="stats-grid" id="stats-container">
+            <div class="stat-item">
+              <span class="stat-value" id="stat-games">0</span>
+              <span class="stat-label">Partite</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-value" id="stat-avg">0%</span>
+              <span class="stat-label">Media</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-value" id="stat-best">0%</span>
+              <span class="stat-label">Record</span>
+            </div>
+          </div>
+        </div>
+
+        <button id="start-quiz-btn" class="btn btn-primary btn-large btn-glow">
+          <span class="btn-icon">🚀</span>
+          <span>Nuova Partita</span>
+        </button>
+
+        <div class="card glass history-card">
+          <h2>📜 Storico Partite</h2>
+          <div id="history-list" class="history-list">
+            <p class="empty-state">Nessuna partita ancora. Inizia a giocare!</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quiz Screen -->
+    <section id="quiz-screen" class="screen">
+      <header class="quiz-header">
+        <div class="quiz-progress">
+          <span id="question-counter">1/10</span>
+          <div class="progress-bar">
+            <div id="progress-fill" class="progress-fill"></div>
+          </div>
+        </div>
+        <div class="timer" id="timer">
+          <span class="timer-icon">⏱️</span>
+          <span id="timer-value">00:00</span>
+        </div>
+      </header>
+
+      <div class="quiz-content">
+        <div class="category-badge" id="question-category">General</div>
+        <div class="question-card glass">
+          <h2 id="question-text">Caricamento domanda...</h2>
+        </div>
+
+        <div class="options-grid" id="options-container">
+          <!-- Options will be inserted here -->
+        </div>
+
+        <button id="next-btn" class="btn btn-primary btn-glow" disabled>
+          <span>Prossima Domanda</span>
+          <span class="btn-icon">→</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Result Screen -->
+    <section id="result-screen" class="screen">
+      <div class="card glass result-card">
+        <div class="result-icon" id="result-icon">🏆</div>
+        <h1 id="result-title">Complimenti!</h1>
+        <p id="result-subtitle">Hai completato il quiz</p>
+
+        <div class="result-stats">
+          <div class="result-stat">
+            <span class="result-value" id="result-score">0%</span>
+            <span class="result-label">Punteggio</span>
+          </div>
+          <div class="result-stat">
+            <span class="result-value" id="result-correct">0/10</span>
+            <span class="result-label">Corrette</span>
+          </div>
+          <div class="result-stat">
+            <span class="result-value" id="result-time">00:00</span>
+            <span class="result-label">Tempo</span>
+          </div>
+        </div>
+
+        <div class="result-actions">
+          <button id="play-again-btn" class="btn btn-primary btn-glow">
+            <span class="btn-icon">🔄</span>
+            <span>Gioca Ancora</span>
+          </button>
+          <button id="back-home-btn" class="btn btn-outline">
+            <span>Torna alla Home</span>
+          </button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
