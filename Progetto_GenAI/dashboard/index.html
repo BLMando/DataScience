@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>📊 Trivia Quiz - Analytics Dashboard</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <div class="dashboard-layout">
+    <header class="header">
+      <div class="header-content">
+        <a href="index.html" class="logo">
+          <span class="logo-icon">📊</span>
+          <span>Trivia Analytics</span>
+        </a>
+        <nav class="nav">
+          <a href="index.html" class="nav-link active">Overview</a>
+          <a href="dashboards/users.html" class="nav-link">Users</a>
+          <a href="dashboards/questions.html" class="nav-link">Questions</a>
+          <a href="dashboards/attempts.html" class="nav-link">Attempts</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="main">
+      <div class="page-header">
+        <h1 class="page-title">Analytics Overview</h1>
+        <p class="page-subtitle">Panoramica aggregata dei dati del sistema Trivia Quiz</p>
+      </div>
+
+      <!-- Global KPIs -->
+      <div class="kpi-grid" id="global-kpis"></div>
+
+      <!-- Entity Cards -->
+      <div class="entity-grid" id="entity-cards"></div>
+
+      <!-- Assumptions -->
+      <div class="assumptions">
+        <h3 class="assumptions-title">⚠️ Assunzioni sui Dati</h3>
+        <ul class="assumptions-list">
+          <li>I dati mostrati sono mock generati per simulare un sistema in produzione con ~50 utenti attivi</li>
+          <li>Le date degli attempts coprono gli ultimi 30 giorni con distribuzione realistica</li>
+          <li>Gli score seguono una distribuzione normale con media ~60% e deviazione standard ~20%</li>
+          <li>Il tempo medio di completamento è stimato tra 3-8 minuti per quiz da 10 domande</li>
+          <li>La difficoltà delle domande è inferita dalla percentuale di risposte corrette aggregate</li>
+        </ul>
+      </div>
+    </main>
+
+    <footer class="footer">
+      Trivia Quiz Analytics Dashboard • Dati mock a scopo dimostrativo
+    </footer>
+  </div>
+
+  <script src="assets/site.js"></script>
+  <script>
+    // Global KPIs
+    Render.kpi('global-kpis', [
+      { label: 'Utenti Totali', value: '47', color: 'primary' },
+      { label: 'Domande nel DB', value: '25', color: 'purple' },
+      { label: 'Quiz Completati', value: '312', color: 'success' },
+      { label: 'Score Medio', value: '62%', color: 'cyan' },
+      { label: 'Tasso Retention', value: '74%', color: 'warning', change: '+5% vs mese prec.', changeDir: 'up' },
+      { label: 'Tempo Medio', value: '4:32', color: 'primary' },
+    ]);
+
+    // Entity Cards
+    document.getElementById('entity-cards').innerHTML = `
+      <a href="dashboards/users.html" class="entity-card">
+        <div class="entity-icon">👥</div>
+        <h2 class="entity-name">Users</h2>
+        <p class="entity-desc">Analisi della base utenti: crescita, engagement, retention e distribuzione attività.</p>
+        <div class="entity-stats">
+          <div class="entity-stat">
+            <span class="entity-stat-value">47</span>
+            <span class="entity-stat-label">Totali</span>
+          </div>
+          <div class="entity-stat">
+            <span class="entity-stat-value">12</span>
+            <span class="entity-stat-label">Nuovi (7gg)</span>
+          </div>
+          <div class="entity-stat">
+            <span class="entity-stat-value">6.6</span>
+            <span class="entity-stat-label">Quiz/utente</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="dashboards/questions.html" class="entity-card">
+        <div class="entity-icon">❓</div>
+        <h2 class="entity-name">Questions</h2>
+        <p class="entity-desc">Distribuzione per categoria, analisi difficoltà e bilanciamento risposte corrette.</p>
+        <div class="entity-stats">
+          <div class="entity-stat">
+            <span class="entity-stat-value">25</span>
+            <span class="entity-stat-label">Totali</span>
+          </div>
+          <div class="entity-stat">
+            <span class="entity-stat-value">5</span>
+            <span class="entity-stat-label">Categorie</span>
+          </div>
+          <div class="entity-stat">
+            <span class="entity-stat-value">58%</span>
+            <span class="entity-stat-label">% Corrette</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="dashboards/attempts.html" class="entity-card">
+        <div class="entity-icon">🎯</div>
+        <h2 class="entity-name">Attempts</h2>
+        <p class="entity-desc">Performance quiz, distribuzione punteggi, trend temporali e tempi di completamento.</p>
+        <div class="entity-stats">
+          <div class="entity-stat">
+            <span class="entity-stat-value">312</span>
+            <span class="entity-stat-label">Totali</span>
+          </div>
+          <div class="entity-stat">
+            <span class="entity-stat-value">62%</span>
+            <span class="entity-stat-label">Score Medio</span>
+          </div>
+          <div class="entity-stat">
+            <span class="entity-stat-value">4:32</span>
+            <span class="entity-stat-label">Tempo Medio</span>
+          </div>
+        </div>
+      </a>
+    `;
+  </script>
+</body>
+</html>

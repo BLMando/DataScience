@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>👥 Users - Trivia Analytics</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+  <div class="dashboard-layout">
+    <header class="header">
+      <div class="header-content">
+        <a href="../index.html" class="logo">
+          <span class="logo-icon">📊</span>
+          <span>Trivia Analytics</span>
+        </a>
+        <nav class="nav">
+          <a href="../index.html" class="nav-link">Overview</a>
+          <a href="users.html" class="nav-link active">Users</a>
+          <a href="questions.html" class="nav-link">Questions</a>
+          <a href="attempts.html" class="nav-link">Attempts</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="main">
+      <div class="page-header">
+        <h1 class="page-title">👥 User Activity Overview</h1>
+        <p class="page-subtitle">Analisi della base utenti: crescita, engagement e distribuzione attività</p>
+      </div>
+
+      <!-- KPIs -->
+      <div class="kpi-grid" id="kpis"></div>
+
+      <div class="grid-2">
+        <!-- Engagement Distribution -->
+        <div class="section">
+          <h3 class="section-title">📊 Distribuzione Engagement</h3>
+          <div class="chart-bar" id="engagement-chart"></div>
+        </div>
+
+        <!-- Registration Trend -->
+        <div class="section">
+          <h3 class="section-title">📅 Registrazioni Ultimi 7 Giorni</h3>
+          <div class="h-bars" id="registration-chart"></div>
+        </div>
+      </div>
+
+      <!-- Top Users -->
+      <div class="section">
+        <h3 class="section-title">🏆 Top Users per Attività</h3>
+        <div class="chart-bar" id="top-users-chart"></div>
+      </div>
+
+      <!-- Sample Data -->
+      <div class="section">
+        <h3 class="section-title">📋 Snapshot Utenti</h3>
+        <div id="users-table"></div>
+      </div>
+
+      <!-- Insights -->
+      <div class="section">
+        <h3 class="section-title">💡 Insight Analitici</h3>
+        <div class="insights-list" id="insights"></div>
+      </div>
+    </main>
+
+    <footer class="footer">
+      Trivia Quiz Analytics Dashboard • Dati mock a scopo dimostrativo
+    </footer>
+  </div>
+
+  <script src="../assets/site.js"></script>
+  <script src="users-data.js"></script>
+  <script>
+    // KPIs
+    Render.kpi('kpis', [
+      { label: 'Utenti Totali', value: UsersData.total, color: 'primary' },
+      { label: 'Nuovi (7gg)', value: UsersData.newLast7Days, color: 'success', change: '+34% vs settimana prec.', changeDir: 'up' },
+      { label: 'Nuovi (30gg)', value: UsersData.newLast30Days, color: 'cyan' },
+      { label: 'Utenti Attivi', value: UsersData.activeUsers, color: 'purple' },
+      { label: 'Tasso Retention', value: '74%', color: 'warning' },
+      { label: 'Quiz/Utente (media)', value: '6.6', color: 'primary' },
+    ]);
+
+    // Engagement Distribution
+    Render.barChart('engagement-chart', UsersData.engagementDistribution);
+
+    // Registration Trend
+    Render.verticalBars('registration-chart', UsersData.registrationTrend, 'primary');
+
+    // Top Users
+    Render.barChart('top-users-chart', UsersData.topUsers.map(u => ({
+      label: u.username,
+      value: u.attempts,
+      display: `${u.attempts} (${u.avgScore}% avg)`,
+      color: 'success'
+    })));
+
+    // Table
+    Render.table('users-table', [
+      { key: 'id', label: 'ID' },
+      { key: 'username', label: 'Username', render: v => `<strong>${v}</strong>` },
+      { key: 'created_at', label: 'Registrato il', render: v => Utils.formatDate(v) },
+      { key: 'attempts', label: 'Tentativi' },
+      { key: 'avgScore', label: 'Score Medio', render: v => `<span class="badge ${v >= 70 ? 'success' : v >= 50 ? 'warning' : 'error'}">${v}%</span>` },
+    ], UsersData.sampleRecords);
+
+    // Insights
+    Render.insights('insights', UsersData.insights);
+  </script>
+</body>
+</html>

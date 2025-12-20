@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>❓ Questions - Trivia Analytics</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+  <div class="dashboard-layout">
+    <header class="header">
+      <div class="header-content">
+        <a href="../index.html" class="logo">
+          <span class="logo-icon">📊</span>
+          <span>Trivia Analytics</span>
+        </a>
+        <nav class="nav">
+          <a href="../index.html" class="nav-link">Overview</a>
+          <a href="users.html" class="nav-link">Users</a>
+          <a href="questions.html" class="nav-link active">Questions</a>
+          <a href="attempts.html" class="nav-link">Attempts</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="main">
+      <div class="page-header">
+        <h1 class="page-title">❓ Question Usage Insights</h1>
+        <p class="page-subtitle">Distribuzione categorie, analisi difficoltà e bilanciamento risposte corrette</p>
+      </div>
+
+      <!-- KPIs -->
+      <div class="kpi-grid" id="kpis"></div>
+
+      <div class="grid-2">
+        <!-- Category Distribution -->
+        <div class="section">
+          <h3 class="section-title">📂 Distribuzione per Categoria</h3>
+          <div class="chart-bar" id="category-chart"></div>
+        </div>
+
+        <!-- Answer Distribution -->
+        <div class="section">
+          <h3 class="section-title">🔤 Distribuzione Risposte Corrette</h3>
+          <div class="chart-bar" id="answer-chart"></div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <!-- Difficulty Distribution -->
+        <div class="section">
+          <h3 class="section-title">📊 Difficoltà (basata su % risposte corrette)</h3>
+          <div class="chart-bar" id="difficulty-chart"></div>
+        </div>
+
+        <!-- Hardest Questions -->
+        <div class="section">
+          <h3 class="section-title">🔥 Domande Più Difficili</h3>
+          <div class="chart-bar" id="hardest-chart"></div>
+        </div>
+      </div>
+
+      <!-- Easiest Questions -->
+      <div class="section">
+        <h3 class="section-title">✅ Domande Più Facili</h3>
+        <div class="chart-bar" id="easiest-chart"></div>
+      </div>
+
+      <!-- Sample Data -->
+      <div class="section">
+        <h3 class="section-title">📋 Snapshot Domande</h3>
+        <div id="questions-table"></div>
+      </div>
+
+      <!-- Insights -->
+      <div class="section">
+        <h3 class="section-title">💡 Insight Analitici</h3>
+        <div class="insights-list" id="insights"></div>
+      </div>
+    </main>
+
+    <footer class="footer">
+      Trivia Quiz Analytics Dashboard • Dati mock a scopo dimostrativo
+    </footer>
+  </div>
+
+  <script src="../assets/site.js"></script>
+  <script src="questions-data.js"></script>
+  <script>
+    // KPIs
+    Render.kpi('kpis', [
+      { label: 'Domande Totali', value: QuestionsData.total, color: 'primary' },
+      { label: 'Categorie', value: QuestionsData.categories, color: 'purple' },
+      { label: '% Corrette (media)', value: QuestionsData.avgCorrectRate + '%', color: 'success' },
+      { label: 'Domande Facili', value: '7', color: 'cyan' },
+      { label: 'Domande Difficili', value: '7', color: 'error' },
+      { label: 'Risposta Più Comune', value: 'B (48%)', color: 'warning' },
+    ]);
+
+    // Category Distribution
+    Render.barChart('category-chart', QuestionsData.categoryDistribution);
+
+    // Answer Distribution
+    Render.barChart('answer-chart', QuestionsData.answerDistribution);
+
+    // Difficulty Distribution
+    Render.barChart('difficulty-chart', QuestionsData.difficultyDistribution);
+
+    // Hardest Questions
+    Render.barChart('hardest-chart', QuestionsData.hardestQuestions.map(q => ({
+      label: q.text.substring(0, 35) + '...',
+      value: q.correctRate,
+      display: q.correctRate + '%',
+      color: 'error'
+    })));
+
+    // Easiest Questions
+    Render.barChart('easiest-chart', QuestionsData.easiestQuestions.map(q => ({
+      label: q.text.substring(0, 35) + '...',
+      value: q.correctRate,
+      display: q.correctRate + '%',
+      color: 'success'
+    })));
+
+    // Table
+    const categoryColors = {
+      'Science': 'primary',
+      'Geography': 'success', 
+      'History': 'purple',
+      'Technology': 'cyan',
+      'Entertainment': 'warning'
+    };
+
+    Render.table('questions-table', [
+      { key: 'id', label: 'ID' },
+      { key: 'text', label: 'Domanda', render: v => v.length > 40 ? v.substring(0, 40) + '...' : v },
+      { key: 'category', label: 'Categoria', render: v => `<span class="badge ${categoryColors[v]}">${v}</span>` },
+      { key: 'correct_answer', label: 'Risp.' },
+      { key: 'correctRate', label: '% Corrette', render: v => `<span class="badge ${v >= 70 ? 'success' : v >= 50 ? 'warning' : 'error'}">${v}%</span>` },
+    ], QuestionsData.sampleRecords);
+
+    // Insights
+    Render.insights('insights', QuestionsData.insights);
+  </script>
+</body>
+</html>
