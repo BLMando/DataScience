@@ -1,0 +1,13 @@
+[project]
+name = "src"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "nltk>=3.9.2",
+    "pandas>=2.3.3",
+    "scikit-learn>=1.7.2",
+    "spacy>=3.8.11",
+    "textacy>=0.13.0",
+]
