@@ -212,3 +212,7 @@ models/
 .rasa/
 Progetto_Chatbot/.rasa/cache/cache.db
 node_modules/
+*.aux
+*.out
+*.toc
+*.pdf
