@@ -170,11 +170,22 @@ print(f"Accuracy finale: {accuracy_score(y_test, y_pred):.4f}")
 # %%
 labels = sorted(y_test.unique())
 cm = confusion_matrix(y_test, y_pred, labels=labels)
-fig = px.imshow(cm, x=labels, y=labels, color_continuous_scale='Blues',
-                labels=dict(x='Predetto', y='Reale', color='Count'),
-                text_auto=True, title='Matrice di Confusione', height=800, width=800)
-fig.update_layout(xaxis_title='Predetto', yaxis_title='Reale')
-fig.show()
+
+plt.figure(figsize=(12, 10))
+sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=labels, yticklabels=labels)
+plt.title('Matrice di Confusione')
+plt.ylabel('Reale')
+plt.xlabel('Predetto')
+plt.xticks(rotation=90)
+plt.yticks(rotation=0)
+plt.tight_layout()
+plt.savefig('data/confusion_matrix.png', dpi=300)
+print("Matrice di confusione salvata in data/confusion_matrix.png")
+# fig = px.imshow(cm, x=labels, y=labels, color_continuous_scale='Blues',
+#                 labels=dict(x='Predetto', y='Reale', color='Count'),
+#                 text_auto=True, title='Matrice di Confusione', height=800, width=800)
+# fig.update_layout(xaxis_title='Predetto', yaxis_title='Reale')
+# fig.show()
 
 # %% [markdown]
 # ## 6. Inferenza
