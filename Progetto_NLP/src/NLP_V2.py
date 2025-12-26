@@ -12,20 +12,20 @@
 # 6. Inferenza
 
 # %%
-from collections import Counter
 from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS, TfidfVectorizer
-from sklearn.metrics import classification_report, confusion_matrix, accuracy_score, confusion_matrix
+from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 from sklearn.model_selection import train_test_split
 from sklearn.svm import LinearSVC
+from sklearn.calibration import CalibratedClassifierCV
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-import re
 import seaborn as sns
-import string
 from wordcloud import WordCloud
+from tools import utils as u
+from tools import plotting as p
 
 # %% [markdown]
 # ## 1. Caricamento e Preprocessing dei Dati
@@ -34,26 +34,8 @@ from wordcloud import WordCloud
 df = pd.read_csv('data/Resume.csv')
 
 print(f"Dataset caricato con successo: {df.shape[0]} righe, {df.shape[1]} colonne")
-def clean_text(text):
-    s = str(text)
-    tokens = s.split()
-    i = 0
 
-    # Rimozione delle parole iniziali tutte maiuscole
-    while i < len(tokens):
-        letters = re.sub(r'[^A-Za-z]', '', tokens[i])
-        if letters and letters.isupper():
-            i += 1
-            continue
-        break
-    trimmed = ' '.join(tokens[i:]) if i < len(tokens) else s
-
-    trimmed = trimmed.lower()
-    trimmed = trimmed.translate(str.maketrans('', '', string.punctuation))
-    trimmed = re.sub(r'\s+', ' ', trimmed).strip()  # Rimuove spazi extra
-    return trimmed
-
-df['cleaned_resume'] = df['Resume_str'].apply(clean_text)
+df['cleaned_resume'] = df['Resume_str'].apply(u.preprocess_text)
 
 # Visualizzazione delle classi
 print("\nDistribuzione delle Categorie:")
@@ -66,43 +48,27 @@ print(df['Category'].value_counts().head())
 # # Wordcloud
 
 # %%
-MAX_WORDS = 500
-def top_words_from_series(series, n=MAX_WORDS):
-    corpus = ' '.join(series.dropna().astype(str))
-    tokens = re.findall(r'\b[a-z]+\b', corpus)
-    tokens = [t for t in tokens if t not in ENGLISH_STOP_WORDS]
-    return Counter(tokens).most_common(n)
+# Definizione Custom Stop Words per rimuovere termini generici da CV (come suggerito dal report)
+custom_stop_words = list(ENGLISH_STOP_WORDS) + ['experience', 'skills', 'worked', 'team', 'responsible']
 
-wc = WordCloud(
+MAX_WORDS = 500
+wc_obj = WordCloud(
     width=800, 
     height=700, 
     background_color='white',
     max_words=MAX_WORDS,
     contour_width=0,
-    colormap='viridis'  # 'viridis', 'plasma', or 'inferno' work well for data
+    colormap='viridis'
 )
 
-wc.generate_from_frequencies(dict(top_words_from_series(df['cleaned_resume'], n=MAX_WORDS)))
-
-plt.figure(figsize=(10, 5))
-plt.imshow(wc, interpolation='bilinear')
-plt.axis('off') # Remove axes for a cleaner look
-plt.title("Word Cloud of Top Words", fontsize=14, pad=20)
-plt.tight_layout()
-plt.savefig("data/wordcloud/wordcloud_overall.png", dpi=300)
-plt.close()
+# Overall WordCloud
+fig = p.wordcloud(wc_obj, df['cleaned_resume'], MAX_WORDS, custom_stop_words, "Word Cloud of Top Words")
+fig.savefig("data/wordcloud/wordcloud_overall.png", dpi=300)
 
 for category in df['Category'].unique():
     category_df = df[df['Category'] == category]
-    wc.generate_from_frequencies(dict(top_words_from_series(category_df['cleaned_resume'], n=100)))
-    
-    plt.figure(figsize=(10, 5))
-    plt.imshow(wc, interpolation='bilinear')
-    plt.axis('off') # Remove axes for a cleaner look
-    plt.title(f"Word Cloud for Category: {category}", fontsize=14, pad=20)
-    plt.tight_layout()
-    plt.savefig(f"data/wordcloud/wordcloud_{category}.png", dpi=300)
-    plt.close()
+    fig = p.wordcloud(wc_obj, category_df['cleaned_resume'], 100, custom_stop_words, f"Word Cloud for Category: {category}")
+    fig.savefig(f"data/wordcloud/wordcloud_{category}.png", dpi=300)
 
 # %%
 counts = df['Category'].value_counts().reset_index()
@@ -136,8 +102,9 @@ print(f"Dimensioni Test: {X_test.shape[0]}")
 
 # %%
 # Inizializzazione del vettorizzatore
-# max_features=5000 limita il vocabolario alle 5000 parole più importanti per ridurre la dimensionalità
-vectorizer = TfidfVectorizer(stop_words='english', max_features=5000, ngram_range=(1, 2))
+# Utilizziamo le custom_stop_words definite precedentemente
+# Aumentiamo max_features (o rimuoviamo il limite) per catturare la coda lunga dei termini tecnici
+vectorizer = TfidfVectorizer(stop_words=custom_stop_words, max_features=20000, ngram_range=(1, 2))
 
 # Fit solo sul training set per evitare data leakage
 X_train_vec = vectorizer.fit_transform(X_train)
@@ -151,9 +118,12 @@ print(f"Shape della matrice di feature (Train): {X_train_vec.shape}")
 # Utilizziamo una **Linear SVC (Support Vector Classifier)**, nota per essere veloce e accurata nella classificazione di testi.
 
 # %%
-model = LinearSVC(random_state=42, dual='auto')
+# Utilizziamo class_weight='balanced' per gestire lo sbilanciamento delle classi
+# E CalibratedClassifierCV per ottenere probabilità (confidence scores)
+base_svc = LinearSVC(random_state=42, dual='auto', class_weight='balanced')
+model = CalibratedClassifierCV(base_svc)
 model.fit(X_train_vec, y_train)
-print("Addestramento completato.")
+print("Addestramento completato (con calibrazione probabilità).")
 
 # %% [markdown]
 # ## 5. Valutazione del Modello
@@ -193,14 +163,17 @@ print("Matrice di confusione salvata in data/confusion_matrix.png")
 
 # %%
 sample_row = df.sample(1).iloc[0]
-resume_text = sample_row['cleaned_resume']
+resume_text = sample_row['Resume_str'] # Use the raw text to test full pipeline
 true_label = sample_row['Category']
 
-sample_clean = clean_text(resume_text)
+sample_clean = u.preprocess_text(resume_text)
 sample_vec = vectorizer.transform([sample_clean])
 
 prediction = model.predict(sample_vec)[0]
+proba = model.predict_proba(sample_vec)[0]
+confidence = np.max(proba)
 
 print(f"Testo Input:\n{resume_text.strip()}")
 print(f"\nCategoria Predetta: {prediction}")
+print(f"Confidence: {confidence:.2f}")
 print(f"Categoria Reale: {true_label}")
