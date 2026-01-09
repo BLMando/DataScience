@@ -36,18 +36,65 @@ def preprocess_text(text):
     - Replace punctuation with spaces
     - POS-aware Lemmatization
     """
-    # 1. Lowercase
+    # Remove label
+    s = str(text)
+    tokens = s.split()
+    i = 0
+
+    while i < len(tokens):
+        letters = re.sub(r'[^A-Za-z]', '', tokens[i])
+        if letters and letters.isupper():
+            i += 1
+            continue
+        break
+    
+    text = ' '.join(tokens[i:]) if i < len(tokens) else s
+
+    #  Lowercase
     text = str(text).lower()
-    
-    # 2. Domain-specific replacements
-    text = text.replace("c++", "cplusplus")
-    text = text.replace("c#", "csharp")
-    text = text.replace(".net", "dotnet")
-    
-    # 3. Replace punctuation with space
+
+    #  Domain-specific replacements
+    replacements = {
+        "c++": "cplusplus",
+        "c#": "csharp",
+        "f#": "fsharp",
+        "node.js": "nodejs",
+        "react.js": "reactjs",
+        "vue.js": "vuejs",
+        "three.js": "threejs",
+        "socket.io": "socketio",
+        "objective-c": "objectivec",
+        "objective c": "objectivec",
+        ".net": "dotnet",
+        ".yaml": "yaml",
+        ".yml": "yaml",
+        ".scss": "sass",
+        ".md": "markdown",
+        ".py": "python",
+        ".js": "javascript",
+        ".ts": "typescript",
+        ".rb": "ruby",
+        ".rs": "rust",
+        ".go": "golang",
+        ".sql": "sql",
+        ".php": "php",
+        ".html": "html",
+        ".css": "css",
+        ".sh": "bash",
+        ".zsh": "zsh",
+        ".mk": "make",
+        ".json": "json",
+        ".xml": "xml",
+        ".csv": "csv"
+    } 
+
+    for old, new in replacements.items():
+        text = text.replace(old, new)
+
+    #  Replace punctuation with space
     text = re.sub(f'[{re.escape(string.punctuation)}]', ' ', text)
     
-    # 4. Tokenization and POS-aware Lemmatization
+    #  Tokenization and POS-aware Lemmatization
     tokens = text.split()
     if not tokens:
         return ""
